@@ -24,7 +24,7 @@ export default function landingPage() {
         <h1><span style={{color: "#FF9839"}}>connect</span> <span style={{color: "white"}}>with your loved ones</span></h1>
         <p style={{textAlign:"left"}}>cover a distance by apna video call</p>
         <div role="button">
-          <Link to={"/home"}>Get Started</Link>
+          <Link to={"/auth"}>Get Started</Link>
         </div>
       </div>
 

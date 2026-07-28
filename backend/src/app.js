@@ -19,9 +19,6 @@ app.use(express.urlencoded({ limit:"40kb", extended: true }));
 
 app.use("/api/users",userRoutes);
 
-app.get("/",(req,res)=>{
-    res.send("Hello World");
-});
 
 const start = async() => {
     server.listen(8000,()=>{

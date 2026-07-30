@@ -15,16 +15,14 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { AuthContext } from "../contexts/AuthContext";
 import { Snackbar } from "@mui/material";
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function Authentication() {
-  const [username, setUsername] = React.useState();
-  const [password, setPassword] = React.useState();
-  const [name, setName] = React.useState();
-  const [error, setError] = React.useState();
-  const [message, setMessage] = React.useState();
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [message, setMessage] = React.useState("");
 
   const [formState, setFormState] = React.useState(0);
 
@@ -63,14 +61,13 @@ export default function Authentication() {
         component="main"
         sx={{
           minHeight: "100vh",
-          display: "flex",
-          //alignItems: "center",
+          display: "flex",     
           justifyContent: "center",
           backgroundImage: 'url(/auth-img.png)',
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          //position: "relative",
+          
         }}
       >
         <CssBaseline />
@@ -83,14 +80,10 @@ export default function Authentication() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            //justifyContent: "center",
             borderRadius: { xs: 0, md: 3 },
             margin: { xs: 0, md: 4 },
             alignSelf: { xs: "stretch", md: "center" },
-            ml: { xs: 0, md: 6 },
-            mr: { xs: 0, md: 6 },
-            backgroundColor: "rgba(248, 250, 252, 0.95)",
-            
+            backgroundColor: "rgba(248, 250, 252, 0.95)",   
           }}
         >
           <Avatar sx={{ m:3, bgcolor: "secondary.main" }}>

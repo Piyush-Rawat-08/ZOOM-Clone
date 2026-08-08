@@ -1,16 +1,18 @@
 .meetVideoContainer {
     position: relative;
-    height: 100vh;
+    flex: 1;
     background: rgb(70, 74, 131);
+    transition: all 0.3s ease-in-out;
 }
 
 .meetVideoContainer>.meetUserVideo {
     position: absolute;
     bottom: 10vh;
-    height: 20vh;
+    height: 30vh;
     width: auto;
-    right: 0;
+    left: 0;
     border-radius: 20px;
+    z-index: 10;
 }
 
 .buttonContainer {
@@ -18,6 +20,7 @@
     width: 100vw;
     bottom: 0;
     text-align: center;
+    z-index: 10;
 }
 
 .buttonContainer svg {
@@ -35,4 +38,61 @@
     height: 40vh;
     border-radius: 20px;
     object-fit: cover;
+}
+
+.expandedVideo {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.mainContainer {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.chatContainer {
+    width: 400px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #ccc;
+    transition: all 0.3s ease-in-out;
+    z-index: 20;
+}
+
+.chatHeader {
+    padding: 15px;
+    background-color: rgb(163, 23, 121);
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatMessages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chatInputContainer {
+    padding: 15px;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
 }

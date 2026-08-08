@@ -216,7 +216,34 @@ export default function VideoMeet() {
     }
   };
 
-  //getDisplayMediaSuccess
+  let getDisplayMediaSuccess = (stream) => {
+    try {
+      window.localStream.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
+    }
+    window.localStream = stream;
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = stream;
+    }
+    stream.getVideoTracks()[0].onended = () => {
+      setScreen(false);
+      getUserMedia();
+    }
+    for (let id in connections) {
+      if (id === socketIdRef.current)
+        continue;;
+      const videoTrack = stream.getVideoTracks()[0];
+      const senders = connections[id].getSenders();
+      const sender = senders.find((s) => s.track && s.track.kind === "video");
+      if (sender) {
+        sender.replaceTrack(videoTrack);
+      } else {
+        connections[id].addStream(window.localStream);
+        makeOffer(id);
+      }
+    }
+  }
 
   let gotMessageFromServer = (fromId, message) => {
     var signal = typeof message === "string" ? JSON.parse(message) : message;
@@ -375,7 +402,21 @@ export default function VideoMeet() {
     setAudio(!audio);
   }
 
-  //handleScreen
+  let handleScreen = () => {
+    if (screen) {
+      setScreen(false);
+      getUserMedia();
+    } else {
+      navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+        .then((stream) => {
+          setScreen(true);
+          getDisplayMediaSuccess(stream);
+        })
+        .catch((error) => {
+          console.log("screen share error", error);
+        })
+    }
+  }
 
   //handleEndCall
 
@@ -439,7 +480,7 @@ export default function VideoMeet() {
               {audio === true ? <MicIcon /> : <MicOffIcon />}
             </IconButton>
             {screenAvailable === true ? (
-              <IconButton style={{ color: "white" }}>
+              <IconButton onClick={handleScreen} style={{ color: "white" }}>
                 {screen === true ? (
                   <ScreenShareIcon />
                 ) : (

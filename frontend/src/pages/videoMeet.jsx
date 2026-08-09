@@ -13,6 +13,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 import { io } from "socket.io-client";
 import styles from "../styles/videoMeet.module.css";
+import ChatBox from "../components/ChatBox";
 
 const server_url = "http://localhost:8000";
 
@@ -39,8 +40,7 @@ export default function VideoMeet() {
   let [showChat, setShowChat] = useState(false);
   let [screenAvailable, setScreenAvailable] = useState();
   let [messages, setMessages] = useState([]);
-  let [message, setMessage] = useState("");
-  let [newMessages, setNewMessages] = useState(3);
+  let [newMessages, setNewMessages] = useState(0);
   let [askForUsername, setAskForUsername] = useState(true);
   let [username, setUsername] = useState("");
   let [videos, setVideos] = useState([]);
@@ -309,7 +309,7 @@ export default function VideoMeet() {
     socketRef.current.on("connect", () => {
       socketRef.current.emit("join-call", window.location.href);
       socketIdRef.current = socketRef.current.id;
-      //socketRef.current.on("chat-message", addMessage);
+      socketRef.current.on("chat-message", addMessage);
       socketRef.current.on("user-left", (id) => {
         setVideos((videos) => videos.filter((video) => video.socketId != id));
       });
@@ -419,17 +419,34 @@ export default function VideoMeet() {
     }
   }
 
-  //handleEndCall
+  let handleEndCall = () => {
+    try {
+      let tracks = localVideoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
+    }
+    window.location.href = "/";
+  };
 
-  //openChat
+  let openChat = () => {
+    setShowChat(true);
+    setNewMessages(0);
+  };
 
-  //closeChat
+  let closeChat = () => {
+    setShowChat(false);
+  };
 
-  //handleMessage
 
-  //addMessage
-
-  //sendMessage
+  let addMessage = (data, sender, socketIdSender) => {
+    setMessages((prevMessages) => [
+      ...prevMessages, { sender: sender, data: data, socketIdSender: socketIdSender }
+    ]);
+    if (socketIdSender !== socketIdRef.current) {
+      setNewMessages((prevMessages) => prevMessages + 1);
+    }
+  };
 
   let connect = () => {
     setAskForUsername(false);
@@ -475,7 +492,7 @@ export default function VideoMeet() {
               <IconButton onClick={handleVideo} style={{ color: "white" }}>
                 {video === true ? <VideoCamIcon /> : <VideoCamOffIcon />}
               </IconButton>
-              <IconButton style={{ color: "red" }}>
+              <IconButton onClick={handleEndCall} style={{ color: "red" }}>
                 <CallEndIcon />
               </IconButton>
               <IconButton onClick={handleAudio} style={{ color: "white" }}>
@@ -493,7 +510,7 @@ export default function VideoMeet() {
                 <></>
               )}
               <Badge badgeContent={newMessages} max={999} color="secondary">
-                <IconButton onClick={() => setShowChat(!showChat)} style={{ color: "white" }}>
+                <IconButton onClick={openChat} style={{ color: "white" }}>
                   <ChatIcon />
                 </IconButton>
               </Badge>
@@ -530,30 +547,12 @@ export default function VideoMeet() {
             </div>
           </div>
           {showChat && (
-            <div className={styles.chatContainer}>
-              <div className={styles.chatHeader}>
-                <span style={{ color: "white" }}>Chat with Friends <span style={{ color: "red", fontSize: "1.8rem" }}>&hearts;</span></span>
-                <IconButton onClick={() => setShowChat(false)}>
-                  <CloseIcon />
-                </IconButton>
-              </div>
-              <div className={styles.chatMessages}>
-                <p style={{ margin: 0, fontSize: "0.9rem", color: "#666" }}>Welcome to the chat!</p>
-              </div>
-              <div className={styles.chatInputContainer}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  placeholder="Type a message..."
-                  fullWidth
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-                <Button variant="contained" color="primary">
-                  Send
-                </Button>
-              </div>
-            </div>
+            <ChatBox
+              closeChat={closeChat}
+              messages={messages}
+              socket={socketRef.current}
+              username={username}
+            />
           )}
         </div>
       )}

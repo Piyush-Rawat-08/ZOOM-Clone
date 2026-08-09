@@ -10,7 +10,6 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import ChatIcon from "@mui/icons-material/Chat";
-import CloseIcon from "@mui/icons-material/Close";
 import { io } from "socket.io-client";
 import styles from "../styles/videoMeet.module.css";
 import ChatBox from "../components/ChatBox";
@@ -427,7 +426,7 @@ export default function VideoMeet() {
     } catch (e) {
       console.log(e);
     }
-    window.location.href = "/";
+    window.location.href = "/home";
   };
 
   let openChat = () => {

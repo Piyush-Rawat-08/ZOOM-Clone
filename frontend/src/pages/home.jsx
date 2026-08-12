@@ -86,10 +86,69 @@ function HomeComponent() {
     //handleLogout
 
 
-    //handleToggleHistory
+    let handleToggleHistory = async () => {
+        try {
+            if (!showHistory) {
+                const res = await client.get(`get_all_activity?user_id=${userId}`);
+                setHistory(res.data.history || []);
+            }
+        }
+        catch (e) {
+            console.log("error in fetching history", e);
+        }
+        finally {
+            setShowHistory(!showHistory);
+        }
+    };
 
     return (
-        <div>Home Component</div>
+        <div className="homeContainer">
+            <h1 className="headerTitle">Dashboard</h1>
+            <div className="actionSection">
+                <div className="actionBox">
+                    <h3 className="actionTitle ">Start New Meeting</h3>
+                    <button className="btn btn-primary" onClick={handleStartNewMeeting}>
+                        Start New Meeting
+                    </button>
+                </div>
+
+                <div className="actionBox">
+                    <h3 className="actionTitle">Join Meeting</h3>
+                    <div className="inputGroup">
+                        <input className="inputField"
+                            type="text"
+                            placeholder="Enter Meeting Code"
+                            value={joinCode}
+                            onChange={(e) => setJoinCode(e.target.value)}
+                        />
+                        <button className="btn btn-primary" onClick={handleJoinMeeting}>
+                            Join Meeting
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div className="scheduleAction">
+                <h3 className="actionTitle"> Schedule Your Meeting </h3>
+                <form className="scheduleForm" onSubmit={handleScheduleMeeting}>
+                    <input
+                        type="text"
+                        className="inputField scheduleInput"
+                        placeholder="Meeting Title"
+                        value={scheduleTitle}
+                        onChange={(e) => setScheduleTitle(e.target.value)}
+                    />
+                    <input
+                        type="datetime-local"
+                        value={scheduleDate}
+                        onChange={(e) => setScheduleDate(e.target.value)}
+                        className="inputField scheduleInput"
+                    />
+                    <button type="submit" className="btn btn-primary">
+                        Schedule Meeting
+                    </button>
+                </form>
+            </div>
+        </div>
     )
 }
 

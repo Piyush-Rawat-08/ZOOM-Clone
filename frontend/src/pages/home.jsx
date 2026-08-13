@@ -85,7 +85,10 @@ function HomeComponent() {
         }
     };
 
-    //handleLogout
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/");
+    };
 
 
     let handleToggleHistory = async () => {
@@ -105,7 +108,12 @@ function HomeComponent() {
 
     return (
         <div className="homeContainer">
-            <h1 className="headerTitle">Dashboard</h1>
+            <div className="logout-section">
+                <h1 className="headerTitle">Dashboard</h1>
+                <button onClick={handleLogout} className="btn btn-secondary">
+                    Logout
+                </button>
+            </div>
             <div className="actionSection">
                 <div className="actionBox">
                     <h3 className="actionTitle ">Start New Meeting</h3>

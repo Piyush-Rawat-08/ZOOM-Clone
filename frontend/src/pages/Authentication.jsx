@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { AuthContext } from "../contexts/AuthContext";
 import { Snackbar } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 const defaultTheme = createTheme();
 
@@ -24,7 +25,8 @@ export default function Authentication() {
   const [error, setError] = React.useState("");
   const [message, setMessage] = React.useState("");
 
-  const [formState, setFormState] = React.useState(0);
+  const location = useLocation();
+  const [formState, setFormState] = React.useState(location.state?.formMode || 0);
 
   const [open, setOpen] = React.useState(false);
 
@@ -61,13 +63,13 @@ export default function Authentication() {
         component="main"
         sx={{
           minHeight: "100vh",
-          display: "flex",     
+          display: "flex",
           justifyContent: "center",
           backgroundImage: 'url(/auth-img.png)',
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          
+
         }}
       >
         <CssBaseline />
@@ -83,10 +85,10 @@ export default function Authentication() {
             borderRadius: { xs: 0, md: 3 },
             margin: { xs: 0, md: 4 },
             alignSelf: { xs: "stretch", md: "center" },
-            backgroundColor: "rgba(248, 250, 252, 0.95)",   
+            backgroundColor: "rgba(248, 250, 252, 0.95)",
           }}
         >
-          <Avatar sx={{ m:3, bgcolor: "secondary.main" }}>
+          <Avatar sx={{ m: 3, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
 

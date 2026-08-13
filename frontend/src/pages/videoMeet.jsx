@@ -14,6 +14,7 @@ import { io } from "socket.io-client";
 import styles from "../styles/videoMeet.module.css";
 import ChatBox from "../components/ChatBox";
 import VideoComponent from "../components/VideoComponent";
+import { client } from "../contexts/AuthContext.jsx";
 
 const server_url = "http://localhost:8000";
 
@@ -419,12 +420,22 @@ export default function VideoMeet() {
     }
   }
 
-  let handleEndCall = () => {
+  let handleEndCall = async () => {
     try {
       let tracks = localVideoRef.current.srcObject.getTracks();
       tracks.forEach((track) => track.stop());
     } catch (e) {
       console.log(e);
+    }
+
+    try {
+      const urlCode = window.location.pathname.split('/')[1];
+      await client.post("/update_activity_end", {
+        meeting_id: urlCode,
+      });
+    }
+    catch (e) {
+      console.log("Could not update activity status", e);
     }
     window.location.href = "/home";
   };

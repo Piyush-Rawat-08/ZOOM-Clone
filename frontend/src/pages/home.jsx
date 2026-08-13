@@ -1,5 +1,7 @@
 import React from 'react'
+import { useState, useContext } from 'react';
 import withAuth from '../utils/withAuth';
+import "../styles/home.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext, client } from "../contexts/AuthContext";
 
@@ -16,7 +18,7 @@ function HomeComponent() {
     const { userData } = useContext(AuthContext);
     const userId = userData?.username;
 
-    const generateMeetingId = async () => {
+    const generateMeetingId = () => {
         const random = Math.random().toString(36).substring(2, 7) + "-" + Math.random().toString(36).substring(2, 7);
         return random;
     };
@@ -127,7 +129,7 @@ function HomeComponent() {
                     </div>
                 </div>
             </div>
-            <div className="scheduleAction">
+            <div className="scheduleSection">
                 <h3 className="actionTitle"> Schedule Your Meeting </h3>
                 <form className="scheduleForm" onSubmit={handleScheduleMeeting}>
                     <input
@@ -148,8 +150,55 @@ function HomeComponent() {
                     </button>
                 </form>
             </div>
+            <div className="history-section">
+                <div className="history-header">
+                    <h3 className="history-title">Your Activities</h3>
+                    <button onClick={handleToggleHistory} className="btn btn-secondary">
+                        {showHistory ? "Hide History" : "Show History"}
+                    </button>
+                </div>
+                {showHistory && (
+                    <div className="history-container">
+                        {history.length === 0 ? (
+                            <p className="empty-history">No past or scheduled meetings found.</p>
+                        ) : (
+                            <ul className="history-list">
+                                {history.map((meeting) => (
+                                    <li key={meeting._id} className="history-item">
+                                        <div className="history-item-details">
+                                            <h4 className="item-title">{meeting.title}</h4>
+                                            <p className="item-text">
+                                                Code: <strong>{meeting.meeting_id}</strong> | Status: <em>{meeting.status}</em>
+                                            </p>
+
+                                            {meeting.status === 'scheduled' && (
+                                                <small className="item-dates">Scheduled for: {new Date(meeting.scheduled_for).toLocaleString()}</small>
+                                            )}
+                                            {meeting.status === 'completed' && meeting.ended_at && (
+                                                <small className="item-dates">Ended at: {new Date(meeting.ended_at).toLocaleString()}</small>
+                                            )}
+                                        </div>
+
+                                        {meeting.status !== 'completed' && (
+                                            <button
+                                                onClick={() => {
+                                                    setJoinCode(meeting.meeting_id);
+                                                    handleJoinMeeting();
+                                                }}
+                                                className="btn btn-info"
+                                            >
+                                                Join Now
+                                            </button>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
-    )
+    );
 }
 
 export default withAuth(HomeComponent);

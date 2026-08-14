@@ -1,4 +1,5 @@
-import Meeting from '..models/meetingModel.js';
+import { Meeting } from '../models/meetingModel.js';
+
 
 const add_to_activity = async (req, res) => {
     try {
@@ -21,10 +22,11 @@ const add_to_activity = async (req, res) => {
             scheduled_for: scheduledDate || null,
         })
         await newMeeting.save();
-        return res.status(httpStatus.CREATED).json({ message: "Meeting added to activity", meeting: newMeeting });
+        return res.status(201).json({ message: "Meeting added to activity", meeting: newMeeting });
     }
     catch (err) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Something went wrong", error: err });
+        console.log(err);
+        return res.status(500).json({ message: "Something went wrong", error: err });
     }
 };
 

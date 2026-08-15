@@ -1,14 +1,15 @@
 import { Server } from "socket.io";
+import { Meeting } from "../models/meetingModel.js";
 
 let connections = {};
 let messages = {};
 let timeOnline = {};
 
 const connectToSocket = (server) => {
-  const io = new Server(server,{
+  const io = new Server(server, {
     cors: {
       origin: "*",
-      methods: ["GET","POST"],
+      methods: ["GET", "POST"],
       allowedHeaders: ["*"],
       credentials: "true",
     }
@@ -57,8 +58,8 @@ const connectToSocket = (server) => {
         },
         ["", false],
       );
-      if (Found=== true){
-        if (messages[MatchingRoom]=== undefined){
+      if (Found === true) {
+        if (messages[MatchingRoom] === undefined) {
           messages[MatchingRoom] = [];
         }
         messages[MatchingRoom].push({
@@ -66,32 +67,42 @@ const connectToSocket = (server) => {
           "data": data,
           "socket-id-sender": socket.id,
         })
-        console.log("message",MatchingRoom, ":",sender,data);
+        console.log("message", MatchingRoom, ":", sender, data);
 
-        connections[MatchingRoom].forEach((elem)=>{
-          io.to(elem).emit("chat-message", data,sender, socket.id);
+        connections[MatchingRoom].forEach((elem) => {
+          io.to(elem).emit("chat-message", data, sender, socket.id);
         })
       }
     });
 
-    socket.on("disconnect", () => {
-      var diffTime = Math.abs(timeOnline[socket.id]- new Date());
-      
-      var key 
-      
-      for (const [K,V] of JSON.parse(JSON.stringify(Object.entries(connections)))) {
-        for(let a = 0; a<V.length; a++){
-          if (V[a] === socket.id){
+    socket.on("disconnect", async () => {
+      var diffTime = Math.abs(timeOnline[socket.id] - new Date());
+
+      var key
+
+      for (const [K, V] of JSON.parse(JSON.stringify(Object.entries(connections)))) {
+        for (let a = 0; a < V.length; a++) {
+          if (V[a] === socket.id) {
             key = K
 
-            for (let a = 0; a < connections[key].length; a++){
+            for (let a = 0; a < connections[key].length; a++) {
               io.to(connections[key][a]).emit("user-left", socket.id,);
             }
 
             var index = connections[key].indexOf(socket.id);
             connections[key].splice(index, 1);
 
-            if (connections[key].length === 0){
+            if (connections[key].length === 0) {
+              const meetingCode = key.split("/").pop();
+              try {
+                await Meeting.updateMany(
+                  { meeting_id: meetingCode },
+                  { status: "completed", ended_at: Date.now() }
+                );
+              }
+              catch (e) {
+                console.log(e);
+              }
               delete connections[key];
             }
           }

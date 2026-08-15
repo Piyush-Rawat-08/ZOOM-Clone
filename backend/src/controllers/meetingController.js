@@ -30,22 +30,20 @@ const add_to_activity = async (req, res) => {
     }
 };
 
-const update_activity_end = async (req, res) => {
+/*const update_activity_end = async (req, res) => {
     try {
         const { meeting_id } = req.body;
 
-        const updatedMeeting = await Meeting.findOneAndUpdate(
+        const updatedMeeting = await Meeting.updateMany(
             { meeting_id: meeting_id },
-            { status: 'completed' },
-            { ended_at: Date.now() },
-            { new: true }
+            { status: 'completed', ended_at: Date.now() }
         );
         return res.status(200).json({ message: "meeting completed", meeting: updatedMeeting });
     }
     catch (err) {
         return res.status(500).json({ message: "Error updating meeting", error: err });
     }
-};
+};*/
 
 const get_all_activity = async (req, res) => {
     try {

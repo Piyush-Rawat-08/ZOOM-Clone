@@ -313,6 +313,10 @@ export default function VideoMeet() {
       socketRef.current.on("chat-message", addMessage);
       socketRef.current.on("user-left", (id) => {
         setVideos((videos) => videos.filter((video) => video.socketId != id));
+        if (connections[id]) {
+          connections[id].close();
+          delete connections[id];
+        }
       });
       socketRef.current.on("user-joined", (id, clients) => {
         clients.forEach((socketListId) => {
@@ -426,16 +430,6 @@ export default function VideoMeet() {
       tracks.forEach((track) => track.stop());
     } catch (e) {
       console.log(e);
-    }
-
-    try {
-      const urlCode = window.location.pathname.split('/')[1];
-      await client.post("/update_activity_end", {
-        meeting_id: urlCode,
-      });
-    }
-    catch (e) {
-      console.log("Could not update activity status", e);
     }
     window.location.href = "/home";
   };

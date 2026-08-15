@@ -16,7 +16,7 @@ function HomeComponent() {
     const [showHistory, setShowHistory] = useState(false);
 
     const { userData } = useContext(AuthContext);
-    const userId = userData?.username;
+    const userId = userData?.username || localStorage.getItem("username");
 
     const generateMeetingId = () => {
         const random = Math.random().toString(36).substring(2, 7) + "-" + Math.random().toString(36).substring(2, 7);
@@ -87,6 +87,7 @@ function HomeComponent() {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("username");
         navigate("/");
     };
 
@@ -94,7 +95,7 @@ function HomeComponent() {
     let handleToggleHistory = async () => {
         try {
             if (!showHistory) {
-                const res = await client.get(`get_all_activity?user_id=${userId}`);
+                const res = await client.get(`/get_all_activity?user_id=${userId}`);
                 setHistory(res.data.history || []);
             }
         }

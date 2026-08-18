@@ -1,6 +1,6 @@
 import Router from "express";
 import { loginUser, registerUser } from "../controllers/userController.js";
-import { add_to_activity, get_all_activity, update_activity_end } from "../controllers/meetingController.js";
+import { add_to_activity, get_all_activity } from "../controllers/meetingController.js";
 
 const router = Router();
 router.route("/login").post(loginUser);

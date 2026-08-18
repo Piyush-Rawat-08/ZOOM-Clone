@@ -21,7 +21,7 @@ const defaultTheme = createTheme();
 export default function Authentication() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [error, setError] = React.useState("");
   const [message, setMessage] = React.useState("");
 
@@ -38,14 +38,11 @@ export default function Authentication() {
         let result = await handleLogin(username, password);
       }
       if (formState === 1) {
-        let result = await handleRegister(name, username, password);
-        console.log(result);
-        setUsername("");
+        let result = await handleRegister(email, username, password);
         setMessage(result);
         setOpen(true);
         setError("");
-        setFormState(0);
-        setPassword("");
+        await handleLogin(username, password);
       }
     } catch (err) {
       console.log(err);
@@ -117,12 +114,12 @@ export default function Authentication() {
                 margin="normal"
                 required
                 fullWidth
-                id="username"
-                label="Full Name"
-                name="username"
-                value={name}
+                id="email"
+                label="Email"
+                name="email"
+                value={email}
                 autoFocus
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
               />
             ) : (
               <></>

@@ -58,4 +58,4 @@ const get_all_activity = async (req, res) => {
     }
 };
 
-export { add_to_activity, update_activity_end, get_all_activity };
+export { add_to_activity, get_all_activity };

@@ -17,10 +17,10 @@ export const AuthProvider = ({ children }) => {
 
     const router = useNavigate();
 
-    const handleRegister = async (name, username, password) => {
+    const handleRegister = async (email, username, password) => {
         try {
             let request = await client.post("/register", {
-                name: name,
+                email: email,
                 username: username,
                 password: password,
             })

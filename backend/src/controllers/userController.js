@@ -27,8 +27,8 @@ const loginUser = async (req, res) => {
       return res
         .status(httpStatus.OK)
         .json({ message: "Login successful", token: token });
-    }else{
-      return res.status(httpStatus.UNAUTHORIZED).json({message:"Invalid Username and Password"});
+    } else {
+      return res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid Username and Password" });
     }
   } catch (e) {
     return res.status(500).json({ message: `Something went wrong ${e}` });
@@ -36,7 +36,7 @@ const loginUser = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const { name, username, password } = req.body;
+  const { email, username, password } = req.body;
 
   try {
     const existingUser = await User.findOne({ username: req.body.username });
@@ -48,7 +48,7 @@ const registerUser = async (req, res) => {
     const hashPassword = await bcrypt.hash(req.body.password, 10);
 
     const newUser = new User({
-      name: req.body.name,
+      email: req.body.email,
       username: req.body.username,
       password: hashPassword,
     });

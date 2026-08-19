@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button, IconButton, TextField } from "@mui/material";
+import { IconButton } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import VideoCamIcon from "@mui/icons-material/Videocam";
 import VideoCamOffIcon from "@mui/icons-material/VideocamOff";
@@ -14,7 +14,8 @@ import { io } from "socket.io-client";
 import styles from "../styles/videoMeet.module.css";
 import ChatBox from "../components/ChatBox";
 import VideoComponent from "../components/VideoComponent";
-import { client } from "../contexts/AuthContext.jsx";
+import VideoLobby from "../components/videoLobby";
+
 
 const server_url = "http://localhost:8000";
 
@@ -461,35 +462,16 @@ export default function VideoMeet() {
   return (
     <div>
       {askForUsername === true ? (
-        <div>
-          <h1>Video Lobby</h1>
-          <TextField
-            id="outlined-basic"
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            variant="outlined"
-          />
-          <br />
-          <Button variant="contained" onClick={connect}>
-            Connect
-          </Button>
-
-          <div>
-            <video
-              ref={(ref) => {
-                if (ref) {
-                  localVideoRef.current = ref;
-                  if (ref.srcObject !== window.localStream) {
-                    ref.srcObject = window.localStream;
-                  }
-                }
-              }}
-              autoPlay
-              muted
-            ></video>
-          </div>
-        </div>
+        <VideoLobby
+          username={username}
+          setUsername={setUsername}
+          audioAvailable={audioAvailable}
+          setAudioAvailable={setAudioAvailable}
+          videoAvailable={videoAvailable}
+          setVideoAvailable={setVideoAvailable}
+          connect={connect}
+          localVideoRef={localVideoRef}
+        />
       ) : (
         <div className={styles.mainContainer}>
           <div className={styles.meetVideoContainer}>

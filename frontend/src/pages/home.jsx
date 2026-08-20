@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext, client } from "../contexts/AuthContext";
 
 
+
 function HomeComponent() {
     const navigate = useNavigate();
 
@@ -14,6 +15,7 @@ function HomeComponent() {
     const [scheduleDate, setScheduleDate] = useState("");
     const [history, setHistory] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
+    const [meetingTitle, setMeetingTitle] = useState("");
 
     const { userData } = useContext(AuthContext);
     const userId = userData?.username || localStorage.getItem("username");
@@ -29,11 +31,15 @@ function HomeComponent() {
             await client.post('/add_to_activity', {
                 user_id: userId,
                 meeting_id: newMeetingId,
-                title: "Instant Meeting",
+                title: meetingTitle || "Instant Meeting",
                 isScheduled: false,
                 createdAt: new Date(),
             });
-            navigate(`/${newMeetingId}`);
+            navigate(`/${newMeetingId}`, {
+                state: {
+                    title: meetingTitle || "Instant Meeting"
+                }
+            });
         }
         catch (e) {
             console.log("Error Starting Meeting", e);
@@ -118,6 +124,8 @@ function HomeComponent() {
             <div className="actionSection">
                 <div className="actionBox">
                     <h3 className="actionTitle ">Start New Meeting</h3>
+                    <input className="inputField" style={{ marginBottom: "10px" }} type="text" placeholder="Enter meeting title" value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)}
+                    />
                     <button className="btn btn-primary" onClick={handleStartNewMeeting}>
                         Start New Meeting
                     </button>

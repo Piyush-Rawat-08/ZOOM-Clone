@@ -14,7 +14,9 @@ export default function VideoLobby({
     videoAvailable,
     setVideoAvailable,
     connect,
-    localVideoRef
+    localVideoRef,
+    meetingTitle,
+    attendeesCount,
 }) {
 
     const toggleAudio = () => {
@@ -39,8 +41,22 @@ export default function VideoLobby({
 
     return (
         <div className={styles.lobbyContainer}>
-            <div className={styles.lobbyHeaderLogo}>MeetFlow</div>
             <div className={styles.lobbyCard}>
+                <div className={styles.lobbyMeetingInfo}>
+                    <div className={styles.lobbyLogoContainer}>
+                        <VideocamIcon style={{ color: '#06B6D4', fontSize: '2.2rem' }} />
+                        <span className={styles.lobbyLogoText}>MeetFlow</span>
+                    </div>
+                    <h2 className={styles.meetingTitle}>{meetingTitle}</h2>
+                    <div className={styles.meetingDetails}>
+                        <span className={styles.detailBadge}>Ready to Join</span>
+                        {attendeesCount > 0 && (
+                            <span className={styles.detailBadge}>
+                                {attendeesCount}waiting
+                            </span>
+                        )}
+                    </div>
+                </div>
                 <div className={styles.videoPreviewWrapper}>
                     <video className={styles.videoPreview}
                         ref={(ref) => {

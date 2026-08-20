@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { Meeting } from "../models/meetingModel.js";
 
-let connections = {};
+export let connections = {};
 let messages = {};
 let timeOnline = {};
 

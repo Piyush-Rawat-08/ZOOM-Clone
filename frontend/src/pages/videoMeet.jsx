@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "@mui/material";
 import Badge from "@mui/material/Badge";
@@ -15,6 +16,7 @@ import styles from "../styles/videoMeet.module.css";
 import ChatBox from "../components/ChatBox";
 import VideoComponent from "../components/VideoComponent";
 import VideoLobby from "../components/videoLobby";
+import { client } from "../contexts/AuthContext";
 
 
 const server_url = "http://localhost:8000";
@@ -46,6 +48,29 @@ export default function VideoMeet() {
   let [askForUsername, setAskForUsername] = useState(true);
   let [username, setUsername] = useState("");
   let [videos, setVideos] = useState([]);
+
+  const location = useLocation();
+  const [meetingTitle, setMeetingTitle] = useState(location.state?.title || "Loading...");
+  const [attendeesCount, setAttendeesCount] = useState(0);
+
+  useEffect(() => {
+    const fetchMeetingInfo = async () => {
+      try {
+        const meetingCode = window.location.pathname.split('/').pop();
+        const response = await client.get(`/get_meeting_info/${meetingCode}`);
+
+        setMeetingTitle(response.data.title);
+        setAttendeesCount(response.data.attendeesCount);
+      } catch (error) {
+        console.log("Error fetching meeting info", error);
+        if (meetingTitle === "Loading...") {
+          setMeetingTitle("Instant Meeting");
+        }
+      }
+    };
+
+    fetchMeetingInfo();
+  }, []);
 
   useEffect(() => {
     getPermissions();
@@ -471,6 +496,8 @@ export default function VideoMeet() {
           setVideoAvailable={setVideoAvailable}
           connect={connect}
           localVideoRef={localVideoRef}
+          meetingTitle={meetingTitle}
+          attendeesCount={attendeesCount}
         />
       ) : (
         <div className={styles.mainContainer}>

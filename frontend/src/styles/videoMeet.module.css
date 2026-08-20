@@ -119,20 +119,9 @@
     box-sizing: border-box;
 }
 
-.lobbyHeaderLogo {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 2rem;
-    background: linear-gradient(135deg, #8B5CF6, #06B6D4);
-    -webkit-background-clip: text;
-    background-clip: text;
-
-}
-
 .lobbyCard {
     width: 450px;
-    padding: 2.5rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -143,12 +132,62 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
+.lobbyMeetingInfo {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.lobbyLogoContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.lobbyLogoText {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.meetingTitle {
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    margin-top: 0;
+}
+
+.meetingDetails {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.detailBadge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #94A3B8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
 .videoPreviewWrapper {
     width: 100%;
-    height: 250px;
+    height: 220px;
     border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     background: rgba(15, 23, 42, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -162,7 +201,7 @@
 .controlButtons {
     display: flex;
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .roundBtn {

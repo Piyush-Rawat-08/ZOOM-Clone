@@ -1,4 +1,5 @@
 import { Meeting } from '../models/meetingModel.js';
+import { connections } from './socketManager.js';
 
 
 const add_to_activity = async (req, res) => {
@@ -58,4 +59,35 @@ const get_all_activity = async (req, res) => {
     }
 };
 
-export { add_to_activity, get_all_activity };
+const get_meeting_info = async (req, res) => {
+    try {
+        const { meetingId } = req.params;
+
+        const meeting = await Meeting.findOne({ meeting_id: meetingId });
+        const title = meeting ? meeting.title : "Instant Meeting";
+        let attendeesCount = 0;
+
+        for (const key in connections) {
+            if (key.endsWith(meetingId)) {
+                attendeesCount = connections[key].length;
+                break;
+            }
+        }
+
+
+        //const io = req.app.get("io");
+        //if (io) {
+        //const room = io.sockets.adapter.rooms.get(meetingId);
+        //attendeesCount = room ? room.size : 0;
+        //}
+
+
+
+        return res.status(200).json({ title, attendeesCount });
+    } catch (err) {
+        console.log("error getting meeting info:", err);
+        return res.status(500).json({ message: "Failed to fetch meeting info" });
+    }
+};
+
+export { add_to_activity, get_all_activity, get_meeting_info };

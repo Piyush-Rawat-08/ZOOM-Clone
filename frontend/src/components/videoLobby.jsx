@@ -44,7 +44,11 @@ export default function VideoLobby({
             <div className={styles.lobbyCard}>
                 <div className={styles.lobbyMeetingInfo}>
                     <div className={styles.lobbyLogoContainer}>
-                        <VideocamIcon style={{ color: '#06B6D4', fontSize: '2.2rem' }} />
+                        <img
+                            src="/meetflow_logo.jpg.jpg"
+                            alt="MeetFlow Logo"
+                            style={{ width: '60px', height: '60px', borderRadius: '8px', marginRight: '5px' }}
+                        />
                         <span className={styles.lobbyLogoText}>MeetFlow</span>
                     </div>
                     <h2 className={styles.meetingTitle}>{meetingTitle}</h2>

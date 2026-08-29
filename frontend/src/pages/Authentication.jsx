@@ -1,17 +1,10 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { AuthContext } from "../contexts/AuthContext";
 import { Snackbar } from "@mui/material";
-import { useLocation } from "react-router-dom";
-
-const defaultTheme = createTheme();
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import "../styles/AuthPage.css";
+import "../styles/MeetFlow_DesignSystem.css";
 
 export default function Authentication() {
   const [username, setUsername] = React.useState("");
@@ -19,18 +12,26 @@ export default function Authentication() {
   const [email, setEmail] = React.useState("");
   const [error, setError] = React.useState("");
   const [message, setMessage] = React.useState("");
-
+  const router = useNavigate();
   const location = useLocation();
-  const [formState, setFormState] = React.useState(location.state?.formMode || 0);
+  const [formState, setFormState] = useState(0);
 
   const [open, setOpen] = React.useState(false);
 
   const { handleRegister, handleLogin } = React.useContext(AuthContext);
 
-  let handleAuth = async () => {
+  useEffect(() => {
+    if (location.state?.formMode !== undefined) {
+      setFormState(location.state.formMode);
+    }
+  }, [location.state]);
+
+
+  let handleAuth = async (e) => {
+    e.preventDefault();
     try {
       if (formState === 0) {
-        let result = await handleLogin(username, password);
+        await handleLogin(username, password);
       }
       if (formState === 1) {
         let result = await handleRegister(email, username, password);
@@ -50,116 +51,86 @@ export default function Authentication() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Box
-        component="main"
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          backgroundImage: 'url(/auth-img.png)',
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+    <div className="auth-minimal-container">
+      <div className="auth-card glass-panel glitter-sedge">
+        <div className="auth-tabs">
+          <button
+            type="button"
+            className={`tab-btn ${formState === 0 ? 'active' : ''}`}
+            onClick={() => { setFormState(0); setError(""); }}
+          >Sign In</button>
+          <button
+            type="button"
+            className={`tab-btn ${formState === 1 ? 'active' : ''}`}
+            onClick={() => { setFormState(1); setError(""); }}
+          >Sign Up</button>
+        </div>
 
-        }}
-      >
-        <CssBaseline />
-        <Box
-          component={Paper}
-          elevation={6}
-          sx={{
-            width: { xs: "100%", md: "500px" },
-            p: 5,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            borderRadius: { xs: 0, md: 3 },
-            margin: { xs: 0, md: 4 },
-            alignSelf: { xs: "stretch", md: "center" },
-            backgroundColor: "rgba(248, 250, 252, 0.95)",
-          }}
-        >
-          <Avatar sx={{ m: 3, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
 
-          <div>
-            <Button
-              variant={formState === 0 ? "contained" : ""}
-              onClick={() => {
-                setFormState(0);
-              }}
-            >
-              Sign In
-            </Button>
-            <Button
-              variant={formState === 1 ? "contained" : ""}
-              onClick={() => {
-                setFormState(1);
-              }}
-            >
-              Sign Up
-            </Button>
-          </div>
+        <div className="auth-logo-section">
+          <img src="/meetflow_logo.jpg.jpg"
+            alt="MeetFlow Logo"
+            style={{ width: '50px', height: '50px', borderRadius: '12px' }}
+          />
+          <h2 className="logo-text">MeetFlow</h2>
+        </div>
 
-          <Box component="form" noValidate sx={{ mt: 1, width: "100%" }}>
-            {formState === 1 ? (
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email"
-                name="email"
+        <form className="auth-form" onSubmit={handleAuth}>
+          {formState === 1 && (
+            <div className="input-group">
+              <label>Email</label>
+              <input
+                type="email"
+                className="glass-input"
+                placeholder="Enter your email"
                 value={email}
-                autoFocus
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
-            ) : (
-              <></>
-            )}
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="username"
-              label="Username"
-              name="username"
+            </div>
+          )}
+          <div className="input-group">
+            <label>Username</label>
+            <input
+              type="text"
+              className="glass-input"
+              placeholder="Enter your username"
               value={username}
-              autoFocus
               onChange={(e) => setUsername(e.target.value)}
-            />
-            <TextField
-              margin="normal"
               required
-              fullWidth
-              name="password"
-              label="Password"
-              value={password}
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              id="password"
             />
+          </div>
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              className="glass-input"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <p className="error-text">{error}</p>}
+          <button type="submit" className="btn-primary auth-submit">
+            {formState === 0 ? "Login" : "Create Account"}
+          </button>
+        </form>
 
-            <p style={{ color: "red" }}>{error}</p>
+        <div className="auth-footer">
+          {formState === 0 ? (
+            <p>Don't have an account? <span onClick={() => { setFormState(1); setError(""); }}>Sign Up</span></p>
+          ) : (
+            <p>Already have an account? <span onClick={() => { setFormState(0); setError(""); }}>Sign In</span></p>
+          )}
+        </div>
+      </div>
 
-            <Button
-              type="button"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={handleAuth}
-            >
-              {formState === 0 ? "Login " : "Register"}
-            </Button>
-          </Box>
-        </Box>
-
-      </Box>
-
-      <Snackbar open={open} autoHideDuration={4000} message={message} />
-    </ThemeProvider>
+      <Snackbar open={open}
+        autoHideDuration={4000}
+        message={message}
+        onClose={() => setOpen(false)}
+      />
+    </div>
   );
 }

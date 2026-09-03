@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useContext } from 'react';
 import withAuth from '../utils/withAuth';
 import "../styles/home.css";
+import "../styles/MeetFlow_DesignSystem.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext, client } from "../contexts/AuthContext";
 
@@ -16,6 +17,7 @@ function HomeComponent() {
     const [history, setHistory] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
     const [meetingTitle, setMeetingTitle] = useState("");
+    const [activeTab, setActiveTab] = useState("dashboard");
 
     const { userData } = useContext(AuthContext);
     const userId = userData?.username || localStorage.getItem("username");
@@ -97,124 +99,212 @@ function HomeComponent() {
         navigate("/");
     };
 
-
-    let handleToggleHistory = async () => {
+    const fetchHistory = async () => {
         try {
-            if (!showHistory) {
-                const res = await client.get(`/get_all_activity?user_id=${userId}`);
-                setHistory(res.data.history || []);
-            }
+            const res = await client.get(`get_all_activity?user_id=${userId}`);
+            setHistory(res.data.history || []);
         }
         catch (e) {
             console.log("error in fetching history", e);
         }
-        finally {
-            setShowHistory(!showHistory);
+    };
+
+    const handleDeleteMeeting = async (meetingId) => {
+        try {
+            if (!window.confirm("Are you sure you want to delete this meeting from history?")) return;
+            await client.delete(`/delete_activity?meeting_id=${meetingId}&user_id=${userId}`);
+            setHistory(prevHistory => prevHistory.filter(m => m.meeting_id !== meetingId));
+        } catch (e) {
+            console.log("Error deleting meeting", e);
+            alert("Failed to delete meeting.");
         }
     };
 
+
+    const handleSidebarClick = (tab) => {
+        setActiveTab(tab);
+        if (tab === "history") {
+            fetchHistory();
+        }
+    };
+
+
     return (
-        <div className="homeContainer">
-            <div className="logout-section">
-                <h1 className="headerTitle">Dashboard</h1>
-                <button onClick={handleLogout} className="btn btn-secondary">
-                    Logout
-                </button>
-            </div>
-            <div className="actionSection">
-                <div className="actionBox">
-                    <h3 className="actionTitle ">Start New Meeting</h3>
-                    <input className="inputField" style={{ marginBottom: "10px" }} type="text" placeholder="Enter meeting title" value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)}
-                    />
-                    <button className="btn btn-primary" onClick={handleStartNewMeeting}>
-                        Start New Meeting
+        <div className="home-minimal-container">
+            {/* --- Top Header --- */}
+            <header className="home-header">
+                <div className="logo-text">MeetFlow</div>
+                <div className="header-actions">
+                    <span className="welcome-text">Welcome back, {userId}!</span>
+                    <button className="btn-outline logout-btn" onClick={handleLogout}>
+                        Logout
                     </button>
                 </div>
+            </header>
 
-                <div className="actionBox">
-                    <h3 className="actionTitle">Join Meeting</h3>
-                    <div className="inputGroup">
-                        <input className="inputField"
-                            type="text"
-                            placeholder="Enter Meeting Code"
-                            value={joinCode}
-                            onChange={(e) => setJoinCode(e.target.value)}
-                        />
-                        <button className="btn btn-primary" onClick={handleJoinMeeting}>
-                            Join Meeting
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="scheduleSection">
-                <h3 className="actionTitle"> Schedule Your Meeting </h3>
-                <form className="scheduleForm" onSubmit={handleScheduleMeeting}>
-                    <input
-                        type="text"
-                        className="inputField scheduleInput"
-                        placeholder="Meeting Title"
-                        value={scheduleTitle}
-                        onChange={(e) => setScheduleTitle(e.target.value)}
-                    />
-                    <input
-                        type="datetime-local"
-                        value={scheduleDate}
-                        onChange={(e) => setScheduleDate(e.target.value)}
-                        className="inputField scheduleInput"
-                    />
-                    <button type="submit" className="btn btn-primary">
-                        Schedule Meeting
-                    </button>
-                </form>
-            </div>
-            <div className="history-section">
-                <div className="history-header">
-                    <h3 className="history-title">Your Activities</h3>
-                    <button onClick={handleToggleHistory} className="btn btn-secondary">
-                        {showHistory ? "Hide History" : "Show History"}
-                    </button>
-                </div>
-                {showHistory && (
-                    <div className="history-container">
-                        {history.length === 0 ? (
-                            <p className="empty-history">No past or scheduled meetings found.</p>
-                        ) : (
-                            <ul className="history-list">
-                                {history.map((meeting) => (
-                                    <li key={meeting._id} className="history-item">
-                                        <div className="history-item-details">
-                                            <h4 className="item-title">{meeting.title}</h4>
-                                            <p className="item-text">
-                                                Code: <strong>{meeting.meeting_id}</strong> | Status: <em>{meeting.status}</em>
-                                            </p>
+            {/* --- 2. Split Screen Layout --- */}
+            <div className="dashboard-layout">
 
-                                            {meeting.status === 'scheduled' && (
-                                                <small className="item-dates">Scheduled for: {new Date(meeting.scheduled_for).toLocaleString()}</small>
-                                            )}
-                                            {meeting.status === 'completed' && meeting.ended_at && (
-                                                <small className="item-dates">Ended at: {new Date(meeting.ended_at).toLocaleString()}</small>
-                                            )}
-                                        </div>
+                {/* Sidebar on the Left */}
+                <aside className="sidebar glass-panel">
+                    <ul className="sidebar-nav">
+                        <li
+                            className={activeTab === "dashboard" ? "active" : ""}
+                            onClick={() => handleSidebarClick("dashboard")}
+                        >
+                            Dashboard
+                        </li>
+                        <li
+                            className={activeTab === "history" ? "active" : ""}
+                            onClick={() => handleSidebarClick("history")}
+                        >
+                            Meeting History
+                        </li>
+                        <li
+                            className={activeTab === "recordings" ? "active" : ""}
+                            onClick={() => handleSidebarClick("recordings")}
+                        >
+                            My Recordings
+                        </li>
+                    </ul>
+                </aside>
 
-                                        {meeting.status !== 'completed' && (
-                                            <button
-                                                onClick={() => {
-                                                    setJoinCode(meeting.meeting_id);
-                                                    handleJoinMeeting();
-                                                }}
-                                                className="btn btn-info"
-                                            >
-                                                Join Now
-                                            </button>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                )}
+                {/* Main Content on the Right */}
+                <main className="home-content">
+                    {/* Render Dashboard Tab */}
+                    {activeTab === "dashboard" && (
+                        <div className="actions-grid">
+                            <div className="action-box start-box glass-panel">
+                                <h3>Start New Meeting</h3>
+                                <p className="box-subtext">Create an instant meeting</p>
+                                <input
+                                    type="text"
+                                    className="glass-input"
+                                    placeholder="Enter Meeting Title"
+                                    value={meetingTitle}
+                                    onChange={(e) => setMeetingTitle(e.target.value)}
+                                />
+                                <button className="btn-primary" onClick={handleStartNewMeeting}>
+                                    Start Meeting
+                                </button>
+                            </div>
+                            <div className="action-box join-box glass-panel">
+                                <h3>Join Meeting</h3>
+                                <p className="box-subtext">Enter code to join a room</p>
+                                <input
+                                    type="text"
+                                    className="glass-input"
+                                    placeholder="Enter Meeting Code"
+                                    value={joinCode}
+                                    onChange={(e) => setJoinCode(e.target.value)}
+                                />
+                                <button className="btn-primary" onClick={handleJoinMeeting}>
+                                    Join Meeting →
+                                </button>
+                            </div>
+                            <div className="action-box schedule-box glass-panel">
+                                <h3>Schedule Meeting</h3>
+                                <p className="box-subtext">Plan a future meeting</p>
+                                <input
+                                    type="text"
+                                    className="glass-input"
+                                    placeholder="Meeting Title"
+                                    value={scheduleTitle}
+                                    onChange={(e) => setScheduleTitle(e.target.value)}
+                                />
+                                <input
+                                    type="datetime-local"
+                                    className="glass-input"
+                                    value={scheduleDate}
+                                    onChange={(e) => setScheduleDate(e.target.value)}
+                                />
+                                <button className="btn-primary" onClick={handleScheduleMeeting}>
+                                    Schedule
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Render History Tab */}
+                    {activeTab === "history" && (
+                        <section className="history-section glass-panel">
+                            <div className="history-header-bar">
+                                <h2>Your Activities</h2>
+                            </div>
+
+                            <div className="history-table-container">
+                                {history.length === 0 ? (
+                                    <p className="empty-history">No past or scheduled meetings found.</p>
+                                ) : (
+                                    <table className="custom-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Meeting Title</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {history.map((meeting) => (
+                                                <tr key={meeting._id}>
+                                                    <td>
+                                                        {meeting.status === 'scheduled'
+                                                            ? new Date(meeting.scheduled_for).toLocaleDateString()
+                                                            : new Date(meeting.createdAt || Date.now()).toLocaleDateString()
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <strong>{meeting.title}</strong>
+                                                        <br />
+                                                        <small style={{ color: 'var(--text-muted)' }}>ID: {meeting.meeting_id}</small>
+                                                    </td>
+                                                    <td>
+                                                        <span className={`status-badge ${meeting.status}`}>
+                                                            {meeting.status}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {meeting.status !== 'completed' ? (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setJoinCode(meeting.meeting_id);
+                                                                    handleJoinMeeting();
+                                                                }}
+                                                                className="btn-outline join-now-btn"
+                                                                style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                                                            >
+                                                                Join Now
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleDeleteMeeting(meeting.meeting_id)}
+                                                                className="btn-outline delete-btn"
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+
+                    {/* Render Recordings Tab Placeholder */}
+                    {activeTab === "recordings" && (
+                        <section className="glass-panel" style={{ padding: '4rem', textAlign: 'center' }}>
+                            <h2 style={{ color: 'white', marginBottom: '1rem' }}>My Recordings</h2>
+                            <p style={{ color: 'var(--text-muted)' }}>You haven't recorded any meetings yet. This feature is coming soon!</p>
+                        </section>
+                    )}
+                </main>
             </div>
-        </div>
+        </div >
     );
 }
 

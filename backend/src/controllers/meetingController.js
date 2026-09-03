@@ -65,4 +65,34 @@ const get_meeting_info = async (req, res) => {
     }
 };
 
-export { add_to_activity, get_all_activity, get_meeting_info };
+const delete_activity = async (req, res) => {
+    try {
+        const { meeting_id, user_id } = req.query;
+        if (!meeting_id || !user_id) {
+            return res.status(400).json({
+                message: "Meeting ID and User ID are required"
+            });
+        }
+        const deletedMeeting = await Meeting.findOneAndDelete({
+            meeting_id: meeting_id,
+            user_id: user_id,
+        });
+        if (!deletedMeeting) {
+            return res.status(404).json({
+                message: "Meeting not found"
+            });
+        }
+        return res.status(200).json({
+            message: "Meeting deleted successfully",
+        });
+    }
+    catch (e) {
+        console.log("error deleting meeting:", e);
+        return res.status(500).json({
+            message: "failed to delete meeting",
+            error: e
+        });
+    }
+};
+
+export { add_to_activity, get_all_activity, get_meeting_info, delete_activity };

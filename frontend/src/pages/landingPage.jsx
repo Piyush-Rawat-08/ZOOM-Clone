@@ -8,7 +8,7 @@ export default function landingPage() {
     <div className="landing-container">
       <nav className="glass-panel nav-bar">
         <div className="logo-container">
-          <img src="/meetflow_logo.jpg.jpg" alt="MeetFlow Logo" style={{ width: '50px', height: '50px', borderRadius: '8px', marginRight: '10px' }} />
+          <img src="/meetflow_logo.png" alt="MeetFlow Logo" style={{ width: '65px', height: '65px', borderRadius: '8px', marginRight: '10px' }} />
           <span className="logo-text">MeetFlow</span>
         </div>
         <div className="nav-actions">

@@ -45,7 +45,7 @@ export default function VideoLobby({
                 <div className={styles.lobbyMeetingInfo}>
                     <div className={styles.lobbyLogoContainer}>
                         <img
-                            src="/meetflow_logo.jpg.jpg"
+                            src="/meetflow_logo.png"
                             alt="MeetFlow Logo"
                             style={{ width: '60px', height: '60px', borderRadius: '8px', marginRight: '5px' }}
                         />

@@ -68,9 +68,9 @@ export default function Authentication() {
 
 
         <div className="auth-logo-section">
-          <img src="/meetflow_logo.jpg.jpg"
+          <img src="/meetflow_logo.png"
             alt="MeetFlow Logo"
-            style={{ width: '50px', height: '50px', borderRadius: '12px' }}
+            style={{ width: '80px', height: '80px', borderRadius: '12px' }}
           />
           <h2 className="logo-text">MeetFlow</h2>
         </div>

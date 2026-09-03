@@ -41,7 +41,8 @@ export const AuthProvider = ({ children }) => {
         if (request.status === httpStatus.OK) {
             localStorage.setItem("token", request.data.token);
             localStorage.setItem("username", username);
-            setUserData({ username: username });
+            localStorage.setItem("email", request.data.email);
+            setUserData({ username: username, email: request.data.email });
             router("/home");
         }
     }

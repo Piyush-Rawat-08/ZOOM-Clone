@@ -15,12 +15,13 @@ function HomeComponent() {
     const [scheduleTitle, setScheduleTitle] = useState("");
     const [scheduleDate, setScheduleDate] = useState("");
     const [history, setHistory] = useState([]);
-    const [showHistory, setShowHistory] = useState(false);
     const [meetingTitle, setMeetingTitle] = useState("");
     const [activeTab, setActiveTab] = useState("dashboard");
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     const { userData } = useContext(AuthContext);
     const userId = userData?.username || localStorage.getItem("username");
+    const userEmail = userData?.email || localStorage.getItem("email");
 
     const generateMeetingId = () => {
         const random = Math.random().toString(36).substring(2, 7) + "-" + Math.random().toString(36).substring(2, 7);
@@ -48,20 +49,22 @@ function HomeComponent() {
         }
     };
 
-    const handleJoinMeeting = async () => {
+    const handleJoinMeeting = async (codeToJoin = joinCode, titleToJoin = "Joined Meeting") => {
         try {
-            if (joinCode.trim() === "") {
+            if (codeToJoin.trim() === "") {
                 alert("Please enter a meeting code first");
                 return;
             };
             await client.post('/add_to_activity', {
                 user_id: userId,
-                meeting_id: joinCode,
+                meeting_id: codeToJoin,
                 isScheduled: false,
-                title: "Joined Meeting",
+                title: titleToJoin,
                 createdAt: new Date(),
             });
-            navigate(`/${joinCode}`);
+            navigate(`/${codeToJoin}`, {
+                state: { title: titleToJoin }
+            });
         }
         catch (e) {
             console.log("Error Joining Meeting", e);
@@ -133,12 +136,32 @@ function HomeComponent() {
         <div className="home-minimal-container">
             {/* --- Top Header --- */}
             <header className="home-header">
-                <div className="logo-text">MeetFlow</div>
+                <div className="logo-container">
+                    <span><img src="/meetflow_logo.png" className="brand-logo-img" alt="logo" /></span>
+                    <div className="logo-text">MeetFlow</div>
+                </div>
+
                 <div className="header-actions">
                     <span className="welcome-text">Welcome back, {userId}!</span>
-                    <button className="btn-outline logout-btn" onClick={handleLogout}>
-                        Logout
-                    </button>
+                    <div className="profile-container">
+                        <div className="profile-avatar"
+                            onClick={() => setShowProfileMenu(!showProfileMenu)}
+                        >
+                            {userId ? userId.charAt(0).toUpperCase() : "U"}
+                        </div>
+                        {showProfileMenu && (
+                            <div className="profile-dropdown glass-panel">
+                                <div className="dropdown-header">
+                                    <h4>{userId}</h4>
+                                    <p className="user-email">{userEmail}</p>
+                                </div>
+                                <hr className="dropdown-divider" />
+                                <button className="btn-outline logout-btn-full" onClick={handleLogout}>
+                                    Log Out
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
@@ -198,7 +221,7 @@ function HomeComponent() {
                                     value={joinCode}
                                     onChange={(e) => setJoinCode(e.target.value)}
                                 />
-                                <button className="btn-primary" onClick={handleJoinMeeting}>
+                                <button className="btn-primary" onClick={() => handleJoinMeeting(joinCode)}>
                                     Join Meeting →
                                 </button>
                             </div>
@@ -268,11 +291,9 @@ function HomeComponent() {
                                                         {meeting.status !== 'completed' ? (
                                                             <button
                                                                 onClick={() => {
-                                                                    setJoinCode(meeting.meeting_id);
-                                                                    handleJoinMeeting();
+                                                                    handleJoinMeeting(meeting.meeting_id, meeting.title);
                                                                 }}
                                                                 className="btn-outline join-now-btn"
-                                                                style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                                                             >
                                                                 Join Now
                                                             </button>

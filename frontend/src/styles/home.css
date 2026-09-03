@@ -2,8 +2,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    /* Header on top, content below */
-    padding: 2rem 5%;
+    padding: 1.5rem 5%;
 }
 
 .dashboard-layout {
@@ -62,7 +61,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 2rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 3rem;
 }
@@ -83,19 +82,78 @@
 }
 
 .welcome-text {
-    color: var(--text-muted);
     font-size: 1.1rem;
 }
 
-.logout-btn {
-    border-color: rgba(239, 68, 68, 0.4);
-    color: #ef4444;
-    padding: 8px 20px;
+.profile-container {
+    position: relative;
 }
 
-.logout-btn:hover {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.8);
+.profile-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 220px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+}
+
+.dropdown-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: white;
+    text-transform: capitalize;
+}
+
+.user-email {
+    margin: 5px 0 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.dropdown-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+}
+
+.logout-btn-full {
+    width: 100%;
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.logout-btn-full:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #ef4444;
 }
 
 /* --- Main Layout --- */
@@ -108,11 +166,6 @@
     gap: 3rem;
 }
 
-/* 
-  MAGIC TRICK: This single line creates a perfect grid!
-  If the screen is wide, it shows 3 columns.
-  If the screen is narrow, they stack on top of each other automatically!
-*/
 .actions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -239,6 +292,7 @@
     border-color: var(--primary-glow);
     padding: 6px 12px;
     font-size: 0.85rem;
+    min-width: 100px;
 }
 
 .join-now-btn:hover {
@@ -251,10 +305,20 @@
     color: #ef4444;
     padding: 6px 12px;
     font-size: 0.85rem;
+    min-width: 100px;
 }
 
 .delete-btn:hover {
     background: rgba(239, 68, 68, 0.2);
     border-color: #ef4444;
     color: #ef4444;
+}
+
+.brand-logo-img {
+    height: 65px;
+    width: 65px;
+    mix-blend-mode: screen;
+    border-radius: 8px;
+    margin-right: 5px;
+    margin-top: 5.4px;
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import withAuth from '../utils/withAuth';
 import "../styles/home.css";
 import "../styles/MeetFlow_DesignSystem.css";
@@ -18,6 +18,14 @@ function HomeComponent() {
     const [meetingTitle, setMeetingTitle] = useState("");
     const [activeTab, setActiveTab] = useState("dashboard");
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     const { userData } = useContext(AuthContext);
     const userId = userData?.username || localStorage.getItem("username");
@@ -49,12 +57,21 @@ function HomeComponent() {
         }
     };
 
-    const handleJoinMeeting = async (codeToJoin = joinCode, titleToJoin = "Joined Meeting") => {
+    const handleJoinMeeting = async (codeToJoin = joinCode, titleToJoin = "Joined Meeting", scheduledFor = null) => {
         try {
             if (codeToJoin.trim() === "") {
                 alert("Please enter a meeting code first");
                 return;
             };
+
+            if (scheduledFor) {
+                const now = new Date();
+                const scheduledTime = new Date(scheduledFor);
+                if (now < scheduledTime) {
+                    alert(`This meeting hasn't started yet!`);
+                    return;
+                }
+            }
             await client.post('/add_to_activity', {
                 user_id: userId,
                 meeting_id: codeToJoin,
@@ -82,7 +99,7 @@ function HomeComponent() {
                 user_id: userId,
                 meeting_id: meetingId,
                 title: scheduleTitle,
-                scheduled_for: scheduleDate,
+                scheduledDate: scheduleDate,
                 isScheduled: true,
                 createdAt: new Date(),
             });
@@ -126,7 +143,7 @@ function HomeComponent() {
 
     const handleSidebarClick = (tab) => {
         setActiveTab(tab);
-        if (tab === "history") {
+        if (tab === "history" || tab === "scheduled") {
             fetchHistory();
         }
     };
@@ -176,6 +193,12 @@ function HomeComponent() {
                             onClick={() => handleSidebarClick("dashboard")}
                         >
                             Dashboard
+                        </li>
+                        <li
+                            className={activeTab === "scheduled" ? "active" : ""}
+                            onClick={() => handleSidebarClick("scheduled")}
+                        >
+                            Scheduled Meetings
                         </li>
                         <li
                             className={activeTab === "history" ? "active" : ""}
@@ -248,6 +271,76 @@ function HomeComponent() {
                         </div>
                     )}
 
+                    {/* Render Scheduled Meetings Tab */}
+                    {activeTab === "scheduled" && (
+                        <section className="history-section glass-panel">
+                            <div className="history-header-bar">
+                                <h2>Upcoming Scheduled Meetings</h2>
+                            </div>
+                            <div className="history-table-container">
+                                {history.filter(m => m.status === 'scheduled').length === 0 ?
+                                    (
+                                        <p className="empty-history">No upcoming meetings scheduled.</p>
+                                    ) : (
+                                        <table className="custom-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date & time</th>
+                                                    <th>Title</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {history.filter(m => m.status === "scheduled").map((meeting) => (
+                                                    <tr key={meeting._id}>
+                                                        <td>
+                                                            <strong>{new Date(meeting.scheduled_for).toLocaleDateString()}</strong>
+                                                            <br />
+                                                            <small style={{ color: 'var(--text-muted)' }}>
+                                                                {new Date(meeting.scheduled_for).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <strong>{meeting.title}</strong>
+                                                            <br />
+                                                            <small style={{ color: 'var(--text-muted)' }}>
+                                                                ID: {meeting.meeting_id}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <span className={`status-badge ${meeting.status}`}>
+                                                                {meeting.status}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {currentTime < new Date(meeting.scheduled_for) ? (
+                                                                <button
+                                                                    onClick={() => handleDeleteMeeting(meeting.meeting_id)}
+                                                                    className="btn-outline delete-btn"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => handleJoinMeeting(meeting.meeting_id, meeting.title, meeting.scheduled_for)}
+                                                                    className="btn-outline join-now-btn"
+                                                                >
+                                                                    Join Now
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    )
+                                }
+                            </div>
+                        </section>
+                    )}
+
+
                     {/* Render History Tab */}
                     {activeTab === "history" && (
                         <section className="history-section glass-panel">
@@ -256,7 +349,7 @@ function HomeComponent() {
                             </div>
 
                             <div className="history-table-container">
-                                {history.length === 0 ? (
+                                {history.filter(m => m.status !== "scheduled").length === 0 ? (
                                     <p className="empty-history">No past or scheduled meetings found.</p>
                                 ) : (
                                     <table className="custom-table">
@@ -269,7 +362,7 @@ function HomeComponent() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {history.map((meeting) => (
+                                            {history.filter(m => m.status !== "scheduled").map((meeting) => (
                                                 <tr key={meeting._id}>
                                                     <td>
                                                         {meeting.status === 'scheduled'

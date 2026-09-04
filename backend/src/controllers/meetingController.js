@@ -9,10 +9,21 @@ const add_to_activity = async (req, res) => {
             meeting_id,
             title,
             date,
-            status,
             isScheduled,
             scheduledDate
         } = req.body;
+
+        const existingMeeting = await Meeting.findOne({ user_id, meeting_id });
+        if (existingMeeting) {
+            existingMeeting.status = "ongoing";
+
+            if (title && title !== "Joined Meeting") {
+                existingMeeting.title = title;
+            }
+            await existingMeeting.save();
+            return res.status(200).json({ message: "Meeting updated in history", meeting: existingMeeting });
+        }
+
         const meetingStatus = isScheduled ? 'scheduled' : 'ongoing';
         const newMeeting = new Meeting({
             user_id: user_id,

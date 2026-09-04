@@ -26,7 +26,7 @@ const loginUser = async (req, res) => {
       await user.save();
       return res
         .status(httpStatus.OK)
-        .json({ message: "Login successful", token: token });
+        .json({ message: "Login successful", token: token, email: user.email });
     } else {
       return res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid Username and Password" });
     }

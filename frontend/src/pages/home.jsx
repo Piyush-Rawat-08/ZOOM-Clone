@@ -19,13 +19,25 @@ function HomeComponent() {
     const [activeTab, setActiveTab] = useState("dashboard");
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [alertedMeetings, setAlertedMeetings] = useState(new Set());
+
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrentTime(new Date());
+            const now = new Date();
+            setCurrentTime(now);
+            history.forEach(meeting => {
+                if (meeting.status === 'scheduled' && meeting.scheduled_for) {
+                    const scheduledTime = new Date(meeting.scheduled_for);
+                    if (now >= scheduledTime && !alertedMeetings.has(meeting.meeting_id)) {
+                        alert(`⏰ Reminder: Your scheduled meeting "${meeting.title}" is starting now!`);
+                        setAlertedMeetings(prev => new Set(prev).add(meeting.meeting_id));
+                    }
+                }
+            });
         }, 1000);
         return () => clearInterval(timer);
-    }, []);
+    }, [history, alertedMeetings]);
 
     const { userData } = useContext(AuthContext);
     const userId = userData?.username || localStorage.getItem("username");

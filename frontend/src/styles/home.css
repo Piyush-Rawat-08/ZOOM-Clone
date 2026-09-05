@@ -1,8 +1,8 @@
 .home-minimal-container {
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding: 1.5rem 5%;
 }
 
 .dashboard-layout {
@@ -10,16 +10,19 @@
     flex-direction: row;
     gap: 4rem;
     flex: 1;
+    overflow: hidden;
 }
 
 .sidebar {
     width: 250px;
     display: flex;
     flex-direction: column;
-    padding: 2rem;
-    border-radius: 20px;
-    height: fit-content;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+    padding: 2rem 1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0 !important;
+    background: transparent !important;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .sidebar-logo {
@@ -47,6 +50,7 @@
 
 .sidebar-nav li:hover {
     color: var(--text-main);
+
     background: rgba(255, 255, 255, 0.05);
 }
 
@@ -55,15 +59,14 @@
     background: rgba(255, 255, 255, 0.08);
 }
 
-
-/* --- Header Styling --- */
 .home-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 0.5rem;
+    padding: 2.5rem 2rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 3rem;
+    height: 70px;
+    box-sizing: border-box;
 }
 
 .logo-text {
@@ -78,7 +81,7 @@
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 .welcome-text {
@@ -142,6 +145,81 @@
     margin: 1rem 0;
 }
 
+/* --- Notifications --- */
+.notification-icon {
+    position: relative;
+    font-size: 1.4rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-right: 10px;
+}
+
+.notification-icon:hover {
+    color: white;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+    border: 2px solid #0f172a;
+}
+
+.notification-dropdown {
+    width: 280px;
+    right: 60px;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.notification-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-glow);
+    border-radius: 50%;
+    margin-top: 6px;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-content strong {
+    font-size: 0.95rem;
+    color: white;
+}
+
+.notification-content span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
 .logout-btn-full {
     width: 100%;
     border-color: rgba(239, 68, 68, 0.4);
@@ -159,11 +237,14 @@
 /* --- Main Layout --- */
 .home-content {
     max-width: 1200px;
-    margin: 0 auto;
+    margin-top: 4rem;
+    margin-left: -2rem;
+    padding: 0 2rem 4rem 2rem;
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 3rem;
+    overflow-y: auto;
 }
 
 .actions-grid {
@@ -174,7 +255,7 @@
 
 /* --- Action Cards --- */
 .action-box {
-    padding: 3rem 2rem;
+    padding: 2rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -301,17 +382,23 @@
 }
 
 .delete-btn {
-    border-color: rgba(239, 68, 68, 0.4);
+    border-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.05);
     color: #ef4444;
-    padding: 6px 12px;
+    padding: 8px 16px;
     font-size: 0.85rem;
+    font-weight: 600;
     min-width: 100px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
 .delete-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: #ef4444;
     border-color: #ef4444;
-    color: #ef4444;
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
 }
 
 .brand-logo-img {
@@ -321,4 +408,5 @@
     border-radius: 8px;
     margin-right: 5px;
     margin-top: 5.4px;
+    margin-left: -15px;
 }

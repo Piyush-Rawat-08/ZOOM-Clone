@@ -33,7 +33,10 @@ export default function landingPage() {
         </div>
 
         <div className="hero-illustration">
-          <img src="/mobile.png" alt="mobile" className="real-mobile-img" />
+          <img src="/landingPage_img.png" alt="mobile"
+            className="real-mobile-img"
+            style={{ borderRadius: '20px', height: '600px', width: '600px' }}
+          />
         </div>
       </main>
     </div>

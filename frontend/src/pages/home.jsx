@@ -18,26 +18,16 @@ function HomeComponent() {
     const [meetingTitle, setMeetingTitle] = useState("");
     const [activeTab, setActiveTab] = useState("dashboard");
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [alertedMeetings, setAlertedMeetings] = useState(new Set());
 
 
     useEffect(() => {
         const timer = setInterval(() => {
-            const now = new Date();
-            setCurrentTime(now);
-            history.forEach(meeting => {
-                if (meeting.status === 'scheduled' && meeting.scheduled_for) {
-                    const scheduledTime = new Date(meeting.scheduled_for);
-                    if (now >= scheduledTime && !alertedMeetings.has(meeting.meeting_id)) {
-                        alert(`⏰ Reminder: Your scheduled meeting "${meeting.title}" is starting now!`);
-                        setAlertedMeetings(prev => new Set(prev).add(meeting.meeting_id));
-                    }
-                }
-            });
+            setCurrentTime(new Date());
         }, 1000);
         return () => clearInterval(timer);
-    }, [history, alertedMeetings]);
+    }, []);
 
     const { userData } = useContext(AuthContext);
     const userId = userData?.username || localStorage.getItem("username");
@@ -160,6 +150,10 @@ function HomeComponent() {
         }
     };
 
+    const upcomingMeetings = history.filter(m => {
+        if (m.status !== 'scheduled') return false;
+        return currentTime >= new Date(m.scheduled_for);
+    });
 
     return (
         <div className="home-minimal-container">
@@ -172,9 +166,49 @@ function HomeComponent() {
 
                 <div className="header-actions">
                     <span className="welcome-text">Welcome back, {userId}!</span>
+
+                    {/* Notification Bell */}
+                    <div className="profile-container">
+                        <div className="notification-icon" onClick={() => {
+                            setShowNotifications(!showNotifications);
+                            setShowProfileMenu(false);
+                        }}>
+                            <i className="fa-solid fa-bell"></i>
+                            {upcomingMeetings.length > 0 && (
+                                <span className="notification-badge">{upcomingMeetings.length}</span>
+                            )}
+                        </div>
+                        {showNotifications && (
+                            <div className="profile-dropdown glass-panel notification-dropdown">
+                                <div className="dropdown-header">
+                                    <h4>Notifications</h4>
+                                </div>
+                                <hr className="dropdown-divider" />
+                                <div className="notification-list">
+                                    {upcomingMeetings.length === 0 ? (
+                                        <p className="user-email" style={{ textAlign: 'center', padding: '1rem 0' }}>No upcoming meetings</p>
+                                    ) : (
+                                        upcomingMeetings.map(meeting => (
+                                            <div key={meeting._id} className="notification-item" onClick={() => handleSidebarClick('scheduled')}>
+                                                <div className="notification-dot"></div>
+                                                <div className="notification-content">
+                                                    <strong>{meeting.title}</strong>
+                                                    <span>{new Date(meeting.scheduled_for).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="profile-container">
                         <div className="profile-avatar"
-                            onClick={() => setShowProfileMenu(!showProfileMenu)}
+                            onClick={() => {
+                                setShowProfileMenu(!showProfileMenu);
+                                setShowNotifications(false);
+                            }}
                         >
                             {userId ? userId.charAt(0).toUpperCase() : "U"}
                         </div>
@@ -184,10 +218,6 @@ function HomeComponent() {
                                     <h4>{userId}</h4>
                                     <p className="user-email">{userEmail}</p>
                                 </div>
-                                <hr className="dropdown-divider" />
-                                <button className="btn-outline logout-btn-full" onClick={handleLogout}>
-                                    Log Out
-                                </button>
                             </div>
                         )}
                     </div>
@@ -203,26 +233,53 @@ function HomeComponent() {
                         <li
                             className={activeTab === "dashboard" ? "active" : ""}
                             onClick={() => handleSidebarClick("dashboard")}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                         >
+                            <i class="fa-solid fa-house"></i>
                             Dashboard
                         </li>
                         <li
                             className={activeTab === "scheduled" ? "active" : ""}
                             onClick={() => handleSidebarClick("scheduled")}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px', }}
                         >
-                            Scheduled Meetings
+                            <i className="fa-solid fa-calendar-days"></i>
+                            Scheduled
                         </li>
                         <li
                             className={activeTab === "history" ? "active" : ""}
                             onClick={() => handleSidebarClick("history")}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                         >
-                            Meeting History
+                            <i className="fa-solid fa-clock-rotate-left"></i>
+                            History
                         </li>
                         <li
                             className={activeTab === "recordings" ? "active" : ""}
                             onClick={() => handleSidebarClick("recordings")}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                         >
-                            My Recordings
+                            <i className="fa-solid fa-video"></i>
+                            Recordings
+                        </li>
+                    </ul>
+
+                    {/* Bottom Sidebar Actions */}
+                    <ul className="sidebar-nav" style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                        <li
+                            className={activeTab === "settings" ? "active" : ""}
+                            onClick={() => handleSidebarClick("settings")}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                        >
+                            <i className="fa-solid fa-gear"></i>
+                            Settings
+                        </li>
+                        <li
+                            onClick={handleLogout}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ef4444' }}
+                        >
+                            <i className="fa-solid fa-right-from-bracket"></i>
+                            Log Out
                         </li>
                     </ul>
                 </aside>

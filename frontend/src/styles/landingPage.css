@@ -92,8 +92,9 @@
 
 .hero-illustration {
     position: relative;
-    transform: scale(0.85) translateY(-40px);
+    transform: translateY(-65px);
     transform-origin: center right;
+    margin-right: -5rem;
 }
 
 .real-mobile-img {

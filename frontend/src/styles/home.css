@@ -306,7 +306,6 @@
 .history-table-container {
     width: 100%;
     overflow-x: auto;
-    /* Adds scroll if table gets too wide on small screens */
 }
 
 .custom-table {
@@ -333,12 +332,10 @@
     vertical-align: middle;
 }
 
-/* Subtle hover effect for the rows */
 .custom-table tr:hover td {
     background: rgba(255, 255, 255, 0.02);
 }
 
-/* Status Badges */
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;

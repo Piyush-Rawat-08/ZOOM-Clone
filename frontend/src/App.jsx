@@ -5,6 +5,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import HomeComponent from "./pages/home";
 import VideoMeet from "./pages/videoMeet";
 import "./App.css";
+import ModernLandingPage from "./pages/ModernLandingPage";
 
 function App() {
   return (

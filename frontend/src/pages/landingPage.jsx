@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 export default function landingPage() {
   const router = useNavigate();
+  const navigate = router;
   return (
     <div className="landing-container">
+
       <header className="nav-bar">
         <div className="logo-container">
           <img src="/meetflow_logo.png" alt="MeetFlow Logo" style={{ width: '48px', height: '48px', borderRadius: '8px', marginRight: '10px', mixBlendMode: 'screen' }} />
@@ -21,10 +23,11 @@ export default function landingPage() {
           <button className="btn-glass" onClick={() => router("/auth", { state: { formMode: 1 } })}>Get Started Free</button>
         </div>
       </header>
+
       <main className="hero-section">
         <div className="hero-content">
-          <div className="mlp-status-badge">
-            <span className="mlp-pulse-dot"></span>
+          <div className="status-badge">
+            <span className="pulse-dot"></span>
             <span>Ultra-Low Latency WebRTC • Free HD Calls</span>
           </div>
           <h1 className="hero-title">
@@ -39,6 +42,7 @@ export default function landingPage() {
           >
             Get Started
           </button>
+
           {/* Trust Highlights */}
           <div className="hero-chips">
             <span className="hero-chip-item">
@@ -47,8 +51,8 @@ export default function landingPage() {
             <span className="hero-chip-item">
               <span className="hero-chip-icon">✓</span> 1080p Crystal Audio
             </span>
-            <span className="mlp-chip-item">
-              <span className="mlp-chip-icon">✓</span> End-to-End Encrypted
+            <span className="hero-chip-item">
+              <span className="hero-chip-icon">✓</span> End-to-End Encrypted
             </span>
           </div>
         </div>
@@ -60,6 +64,198 @@ export default function landingPage() {
           />
         </div>
       </main>
+
+      {/* Feature Highlights Section (Only Logical & Essential Capabilities) */}
+      <section id="features" className="features-section">
+        <div className="section-header">
+          <span className="section-tag">Essential Features</span>
+          <h2 className="section-title">Built for Speed, Clarity, and Connection</h2>
+          <p className="section-subtitle">
+            Every feature is designed to reduce friction and help you connect instantly with anyone.
+          </p>
+        </div>
+
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feat-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </div>
+            <h3 className="feat-title">Instant 1-Click Rooms</h3>
+            <p className="feat-desc">
+              Generate instant room links or custom join codes in milliseconds. Invite teammates or friends with zero configuration.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 7l-7 5 7 5V7z" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+              </svg>
+            </div>
+            <h3 className="feat-title">Ultra HD Video & Audio</h3>
+            <p className="feat-desc">
+              WebRTC peer-to-peer streaming dynamically adjusts quality to match bandwidth, ensuring smooth 60 FPS video and crisp voice.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+            <h3 className="feat-title">Schedule Meetings</h3>
+            <p className="feat-desc">
+              Plan your video calls in advance with our intuitive scheduling system. Set dates, times, and participants effortlessly.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h3 className="feat-title">Live In-Call Chat</h3>
+            <p className="feat-desc">
+              Share links, drop notes, and exchange messages in real-time during your call without disrupting the ongoing conversation.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="4" fill="currentColor" />
+              </svg>
+            </div>
+            <h3 className="feat-title">
+              Live Recordings
+            </h3>
+            <p className="feat-desc">
+              Capture important meetings, lectures, or discussions with built-in recording capabilities. Automatically save files to secure cloud storage for later review.
+            </p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <h3 className="feat-title">
+              Screen Sharing
+            </h3>
+            <p className="feat-desc">
+              Share your screen with other participants to show presentations, documents, or videos. Collaborate in real-time with screen sharing capabilities.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="steps-section">
+        <div className="section-header">
+          <span className="section-tag">Simple 3-Step Flow</span>
+          <h2 className="section-title">Up and Running in 30 Seconds</h2>
+          <p className="section-subtitle">No complicated setups. No sign-up friction.</p>
+        </div>
+
+        <div className="steps-grid">
+          <div className="step-item">
+            <span className="step-number">01</span>
+            <h3 className="step-title">Create or Join Room</h3>
+            <p className="step-desc">
+              Click Start Instant Meeting to generate a room, or type in an existing code from your host.
+            </p>
+          </div>
+
+          <div className="step-item">
+            <span className="step-number">02</span>
+            <h3 className="step-title">Share the Code</h3>
+            <p className="step-desc">
+              Send your room code or URL to team members. They can join directly from any modern web browser.
+            </p>
+          </div>
+
+          <div className="step-item">
+            <span className="step-number">03</span>
+            <h3 className="step-title">Collaborate in HD</h3>
+            <p className="step-desc">
+              Enjoy high-definition video, crystal audio, screen sharing, and real-time chat with full privacy.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Security Section & Call to Action Banner */}
+      <section id="security" className="cta-section">
+        <div className="cta-card">
+          <div className="security-badge-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span>Enterprise-Grade Privacy & Security</span>
+          </div>
+          <h2 className="cta-title">Ready for Smoother Video Meetings?</h2>
+          <p className="cta-sub">
+            Join thousands of users having fast, clear, and secure video conversations every day on MeetFlow. Direct WebRTC peer-to-peer connection with end-to-end privacy.
+          </p>
+          <div className="cta-btns">
+            <button
+              className="btn-gradient"
+              style={{ padding: '14px 34px', fontSize: '1.05rem' }}
+              onClick={() => navigate('/auth', { state: { formMode: 1 } })}
+            >
+              Get Started Free
+            </button>
+            <button
+              className="btn-glass"
+              style={{ padding: '14px 28px', fontSize: '1.05rem' }}
+              onClick={() => navigate('/auth', { state: { formMode: 0 } })}
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Minimal Clean Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontWeight: '700', color: 'white' }}>MeetFlow</span>
+            <span>© {new Date().getFullYear()} MeetFlow Inc. All rights reserved.</span>
+          </div>
+
+          <div className="footer-status">
+            <span className="pulse-dot"></span>
+            <span>All Systems Operational</span>
+          </div>
+
+          <ul className="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#security">Security</a></li>
+            <li>
+              <button
+                onClick={() => navigate('/auth', { state: { formMode: 0 } })}
+                style={{ background: 'none', border: 'none', color: 'var(--mlp-text-muted)', cursor: 'pointer', padding: 0 }}
+              >
+                Sign In
+              </button>
+            </li>
+          </ul>
+        </div>
+      </footer>
     </div>
   )
 }

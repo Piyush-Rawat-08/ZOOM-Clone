@@ -57,11 +57,119 @@ export default function landingPage() {
           </div>
         </div>
 
-        <div className="hero-illustration">
-          <img src="/landingPage_img.png" alt="mobile"
-            className="real-mobile-img"
-            style={{ borderRadius: '20px', height: '600px', width: '600px' }}
-          />
+        <div className="hero-animation-wrapper">
+          {/* Ambient Background Radar Pulse Rings */}
+          <div className="ambient-radar-ring ring-1"></div>
+          <div className="ambient-radar-ring ring-2"></div>
+          <div className="ambient-radar-ring ring-3"></div>
+
+          {/* Floating Metric Badges */}
+          <div className="hero-floating-pill pill-top">
+            <span className="pill-dot"></span>
+            <span className="pill-text">⚡ 18ms WebRTC Latency</span>
+          </div>
+
+          <div className="hero-floating-pill pill-bottom">
+            <span className="pill-icon">🛡️</span>
+            <span className="pill-text">256-Bit P2P Encrypted</span>
+          </div>
+
+          {/* Main Frosted Call Stage */}
+          <div className="call-stage-card">
+            {/* Stage Header */}
+            <div className="stage-header">
+              <div className="stage-status-live">
+                <span className="rec-blink-dot"></span>
+                <span className="rec-text">LIVE</span>
+                <span className="rec-timer">00:14:32</span>
+              </div>
+              <div className="stage-room-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span>Room: meet-flow-hd</span>
+              </div>
+            </div>
+
+            {/* Video Participants Grid */}
+            <div className="stage-tiles-grid">
+              {/* Participant 1: Host / Active Speaker */}
+              <div className="stage-tile active-speaker">
+                <div className="avatar-circle avatar-violet">
+                  <span>PR</span>
+                  <span className="avatar-mini-status"></span>
+                </div>
+                <div className="tile-info">
+                  <span className="tile-name">You (Host)</span>
+                  {/* Animated Audio Equalizer Bars */}
+                  <div className="audio-equalizer">
+                    <span className="eq-bar bar-1"></span>
+                    <span className="eq-bar bar-2"></span>
+                    <span className="eq-bar bar-3"></span>
+                    <span className="eq-bar bar-4"></span>
+                    <span className="eq-bar bar-5"></span>
+                  </div>
+                </div>
+                <span className="speaking-tag">Speaking</span>
+              </div>
+
+              {/* Participant 2: Remote Peer */}
+              <div className="stage-tile">
+                <div className="avatar-circle avatar-cyan">
+                  <span>AL</span>
+                </div>
+                <div className="tile-info">
+                  <span className="tile-name">Alex R.</span>
+                  <span className="tile-sub">Connected HD</span>
+                </div>
+                <div className="peer-signal">
+                  <span className="signal-bar b1"></span>
+                  <span className="signal-bar b2"></span>
+                  <span className="signal-bar b3"></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Data Stream Beam between participants */}
+            <div className="stream-beam-wrapper">
+              <div className="stream-beam-line">
+                <span className="stream-particle"></span>
+                <span className="stream-particle reverse"></span>
+              </div>
+            </div>
+
+            {/* Stage Floating Controls */}
+            <div className="stage-controls-bar">
+              <div className="stage-control-btn active" title="Microphone On">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+              </div>
+              <div className="stage-control-btn active" title="Camera On">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 7l-7 5 7 5V7z" />
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                </svg>
+              </div>
+              <div className="stage-control-btn" title="Screen Share">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              </div>
+              <div className="stage-control-btn btn-end" title="End Call">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 .8 2.81 2 2 0 0 1-.45 2.11L8.09 9.91" />
+                  <line x1="23" y1="1" x2="1" y2="23" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 

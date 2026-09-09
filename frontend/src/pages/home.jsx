@@ -288,54 +288,102 @@ function HomeComponent() {
                 <main className="home-content">
                     {/* Render Dashboard Tab */}
                     {activeTab === "dashboard" && (
-                        <div className="actions-grid">
-                            <div className="action-box start-box glass-panel">
-                                <h3>Start New Meeting</h3>
-                                <p className="box-subtext">Create an instant meeting</p>
-                                <input
-                                    type="text"
-                                    className="glass-input"
-                                    placeholder="Enter Meeting Title"
-                                    value={meetingTitle}
-                                    onChange={(e) => setMeetingTitle(e.target.value)}
-                                />
-                                <button className="btn-primary" onClick={handleStartNewMeeting}>
-                                    Start Meeting
-                                </button>
+                        <div className="dashboard-tab-content">
+                            <div className="actions-grid">
+                                <div className="action-box start-box glass-panel">
+                                    <h3>Start New Meeting</h3>
+                                    <p className="box-subtext">Create an instant meeting</p>
+                                    <input
+                                        type="text"
+                                        className="glass-input"
+                                        placeholder="Enter Meeting Title"
+                                        value={meetingTitle}
+                                        onChange={(e) => setMeetingTitle(e.target.value)}
+                                    />
+                                    <button className="btn-primary" onClick={handleStartNewMeeting}>
+                                        Start Meeting
+                                    </button>
+                                </div>
+                                <div className="action-box join-box glass-panel">
+                                    <h3>Join Meeting</h3>
+                                    <p className="box-subtext">Enter code to join a room</p>
+                                    <input
+                                        type="text"
+                                        className="glass-input"
+                                        placeholder="Enter Meeting Code"
+                                        value={joinCode}
+                                        onChange={(e) => setJoinCode(e.target.value)}
+                                    />
+                                    <button className="btn-primary" onClick={() => handleJoinMeeting(joinCode)}>
+                                        Join Meeting →
+                                    </button>
+                                </div>
+                                <div className="action-box schedule-box glass-panel">
+                                    <h3>Schedule Meeting</h3>
+                                    <p className="box-subtext">Plan a future meeting</p>
+                                    <input
+                                        type="text"
+                                        className="glass-input"
+                                        placeholder="Meeting Title"
+                                        value={scheduleTitle}
+                                        onChange={(e) => setScheduleTitle(e.target.value)}
+                                    />
+                                    <input
+                                        type="datetime-local"
+                                        className="glass-input"
+                                        value={scheduleDate}
+                                        onChange={(e) => setScheduleDate(e.target.value)}
+                                    />
+                                    <button className="btn-primary" onClick={handleScheduleMeeting}>
+                                        Schedule
+                                    </button>
+                                </div>
                             </div>
-                            <div className="action-box join-box glass-panel">
-                                <h3>Join Meeting</h3>
-                                <p className="box-subtext">Enter code to join a room</p>
-                                <input
-                                    type="text"
-                                    className="glass-input"
-                                    placeholder="Enter Meeting Code"
-                                    value={joinCode}
-                                    onChange={(e) => setJoinCode(e.target.value)}
-                                />
-                                <button className="btn-primary" onClick={() => handleJoinMeeting(joinCode)}>
-                                    Join Meeting →
-                                </button>
-                            </div>
-                            <div className="action-box schedule-box glass-panel">
-                                <h3>Schedule Meeting</h3>
-                                <p className="box-subtext">Plan a future meeting</p>
-                                <input
-                                    type="text"
-                                    className="glass-input"
-                                    placeholder="Meeting Title"
-                                    value={scheduleTitle}
-                                    onChange={(e) => setScheduleTitle(e.target.value)}
-                                />
-                                <input
-                                    type="datetime-local"
-                                    className="glass-input"
-                                    value={scheduleDate}
-                                    onChange={(e) => setScheduleDate(e.target.value)}
-                                />
-                                <button className="btn-primary" onClick={handleScheduleMeeting}>
-                                    Schedule
-                                </button>
+                            {/*Recent Activities section*/}
+                            <div className="recent-activities-section">
+                                {/* Recent Meetings */}
+                                <div className="recent-meetings-column">
+                                    <h3 className="section-title-dash">Recent Meetings</h3>
+                                    <div className="vertical-meetings-list">
+                                        {history.filter(m => m.status !== "scheduled").slice(0, 2).length === 0 ? (
+                                            <p className="empty-subtext">No recent meetings</p>
+                                        ) : (
+                                            history.filter(m => m.status !== "scheduled").slice(0, 2).map(meeting => (
+                                                <div key={meeting._id} className="dash-meeting-card glass-panel">
+                                                    <div className="dash-meeting-info">
+                                                        <h4>{meeting.title}</h4>
+                                                        <p>{new Date(meeting.createdAt || Date.now()).toLocaleDateString()}</p>
+                                                    </div>
+                                                    <button className="btn-outline join-now-btn" onClick={() => handleJoinMeeting(meeting.meeting_id, meeting.title)}>
+                                                        Join Again
+                                                    </button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Recent Recordings */}
+                                <div clasName="recent-recordings-column">
+                                    <h3 className="section-title-dash">Recent Recordings</h3>
+                                    <div clasName="horizontal-recordings-list">
+                                        {/* Mock Data Array */}
+                                        {[
+                                            { id: 1, title: "Project Sync", date: "Sep 7, 2026", duration: "45 min" },
+                                            { id: 2, title: "Design Review", date: "Sep 6, 2026", duration: "32 min" },
+                                            { id: 3, title: "Client Onboarding", date: "Sep 5, 2026", duration: "55 min" }
+                                        ].map(rec => (
+                                            <div key={rec.id} className="dash-recording-card glass-panel">
+                                                <div className="recording-thumbnail">
+                                                    <i className="fa-regular fa-circle-play"></i>
+                                                </div>
+                                                <div className="recording-details">
+                                                    <h4>{rec.title}</h4>
+                                                    <p>{rec.date} • {rec.duration}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}

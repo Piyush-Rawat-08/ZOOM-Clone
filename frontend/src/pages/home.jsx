@@ -108,7 +108,7 @@ function HomeComponent() {
             setScheduleTitle("");
             setScheduleDate("");
             alert("Meeting Scheduled Successfully");
-
+            fetchHistory();
         }
         catch (e) {
             console.log("Error Scheduling Meeting", e);
@@ -341,21 +341,23 @@ function HomeComponent() {
                             </div>
                             {/*Recent Activities section*/}
                             <div className="recent-activities-section">
-                                {/* Recent Meetings */}
+                                {/* Up Next (Meetings) */}
                                 <div className="recent-meetings-column">
-                                    <h3 className="section-title-dash">Recent Meetings</h3>
+                                    <h3 className="section-title-dash">UP NEXT</h3>
                                     <div className="vertical-meetings-list">
-                                        {history.filter(m => m.status !== "scheduled").slice(0, 2).length === 0 ? (
-                                            <p className="empty-subtext">No recent meetings</p>
+                                        {history.filter(m => m.status === "scheduled").slice(0, 2).length === 0 ? (
+                                            <p className="empty-subtext">No upcoming meetings</p>
                                         ) : (
-                                            history.filter(m => m.status !== "scheduled").slice(0, 2).map(meeting => (
-                                                <div key={meeting._id} className="dash-meeting-card glass-panel">
+                                            history.filter(m => m.status === "scheduled").slice(0, 2).map(meeting => (
+                                                <div key={meeting._id} className="dash-meeting-card light-card">
                                                     <div className="dash-meeting-info">
                                                         <h4>{meeting.title}</h4>
-                                                        <p>{new Date(meeting.createdAt || Date.now()).toLocaleDateString()}</p>
+                                                        <p>
+                                                            {new Date(meeting.scheduled_for || Date.now()).toLocaleDateString()} • {meeting.guests ? meeting.guests.length : 2} guests
+                                                        </p>
                                                     </div>
-                                                    <button className="btn-outline join-now-btn" onClick={() => handleJoinMeeting(meeting.meeting_id, meeting.title)}>
-                                                        Join Again
+                                                    <button className="join-now-btn" onClick={() => handleJoinMeeting(meeting.meeting_id, meeting.title)}>
+                                                        Join
                                                     </button>
                                                 </div>
                                             ))
@@ -363,16 +365,16 @@ function HomeComponent() {
                                     </div>
                                 </div>
                                 {/* Recent Recordings */}
-                                <div clasName="recent-recordings-column">
-                                    <h3 className="section-title-dash">Recent Recordings</h3>
-                                    <div clasName="horizontal-recordings-list">
-                                        {/* Mock Data Array */}
+                                <div className="recent-recordings-column">
+                                    <h3 className="section-title-dash">RECENT RECORDINGS</h3>
+                                    <div className="horizontal-recordings-list">
+                                        {/* Mock Data Array based on mockup */}
                                         {[
-                                            { id: 1, title: "Project Sync", date: "Sep 7, 2026", duration: "45 min" },
-                                            { id: 2, title: "Design Review", date: "Sep 6, 2026", duration: "32 min" },
-                                            { id: 3, title: "Client Onboarding", date: "Sep 5, 2026", duration: "55 min" }
+                                            { id: 1, title: "Design review", date: "Sep 2", duration: "38 min" },
+                                            { id: 2, title: "Client onboarding", date: "Aug 30", duration: "22 min" },
+                                            { id: 3, title: "Team standup", date: "Aug 28", duration: "15 min" }
                                         ].map(rec => (
-                                            <div key={rec.id} className="dash-recording-card glass-panel">
+                                            <div key={rec.id} className="dash-recording-card light-card">
                                                 <div className="recording-thumbnail">
                                                     <i className="fa-regular fa-circle-play"></i>
                                                 </div>

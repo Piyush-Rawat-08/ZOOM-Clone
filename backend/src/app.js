@@ -1,8 +1,12 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import cors from "cors";
+
+
 
 import connectToSocket from "./controllers/socketManager.js";
 import userRoutes from "./routes/userRoutes.js";

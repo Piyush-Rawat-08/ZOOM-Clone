@@ -1,6 +1,7 @@
 import Router from "express";
 import { loginUser, registerUser } from "../controllers/userController.js";
 import { add_to_activity, get_all_activity, get_meeting_info, delete_activity } from "../controllers/meetingController.js";
+import { upload, uploadRecording, getUserRecordings, deleteRecording } from "../controllers/recordingController.js";
 
 const router = Router();
 router.route("/login").post(loginUser);
@@ -9,4 +10,8 @@ router.route("/add_to_activity").post(add_to_activity);
 router.route("/get_all_activity").get(get_all_activity);
 router.route("/get_meeting_info/:meetingId").get(get_meeting_info);
 router.route("/delete_activity").delete(delete_activity);
+router.route("/upload_recording").post(upload.single("video"), uploadRecording);
+router.route("/get_recordings").get(getUserRecordings);
+router.route("/delete_recording/:id").delete(deleteRecording);
+
 export default router;

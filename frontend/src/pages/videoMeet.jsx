@@ -11,6 +11,8 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import ChatIcon from "@mui/icons-material/Chat";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import StopCircleIcon from "@mui/icons-material/StopCircle";
 import { io } from "socket.io-client";
 import styles from "../styles/videoMeet.module.css";
 import ChatBox from "../components/ChatBox";
@@ -34,6 +36,9 @@ export default function VideoMeet() {
   let socketIdRef = useRef();
   let localVideoRef = useRef();
   let videoRef = useRef([]);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
 
   let [videoAvailable, setVideoAvailable] = useState(true);
   let [audioAvailable, setAudioAvailable] = useState(true);
@@ -48,6 +53,9 @@ export default function VideoMeet() {
   let [askForUsername, setAskForUsername] = useState(true);
   let [username, setUsername] = useState("");
   let [videos, setVideos] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   const location = useLocation();
   const [meetingTitle, setMeetingTitle] = useState(location.state?.title || "Loading...");
@@ -449,9 +457,103 @@ export default function VideoMeet() {
         })
     }
   }
+  // Format Duration of Recording
+  const formatDuration = (totalSeconds) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = Math.floor(totalSeconds % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  //Start Recording
+  const startRecording = async () => {
+    try {
+      //ask user to select meeting tab with audio
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: { ideal: 30 } },
+        audio: true,
+      });
+      //best supported video format
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus") ? "video/webm;codecs=vp8,opus" : "video/webm";
+      //initialize mediarecorder with the capture stream
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = mediaRecorder;
+      recordedChunksRef.current = [];
+      //collect video chunks every 1 second
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
+        }
+      };
+      //assemble blob and uppload recording to cloudinary
+      mediaRecorder.onstop = async () => {
+        clearInterval(recordingTimerRef.current);
+        setIsRecording(false);
+        setIsUploading(true);
+
+        const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
+        const currentMeetingCode = window.location.pathname.split("/").pop();
+        const currentUserId = localStorage.getItem("username") || username || "anonymous";
+        const formData = new FormData();
+        formData.append("video", blob, `recording-${currentMeetingCode}-${Date.now()}.webm`);
+        formData.append("meeting_id", currentMeetingCode);
+        formData.append("user_id", currentUserId);
+        formData.append("title", meetingTitle || "Meeting Recording");
+        formData.append("duration", formatDuration(recordingTime));
+
+        try {
+          await client.post("/upload_recording", formData, { headers: { "content-Type": "multipart/form-data" } });
+          alert("Recording uploaded to cloudinary successfully");
+        } catch (err) {
+          console.error("Error uploading recording:", err);
+          alert("Failed to upload recording to cloudinary.");
+        } finally {
+          setIsUploading(false);
+          setRecordingTime(0);
+        }
+      };
+      //if user stop sharing via browser
+      stream.getVideoTracks()[0].onended = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+          mediaRecorderRef.current.stop();
+        }
+      };
+      //start collecting data in 1-sec chunks
+      mediaRecorder.start(1000);
+      setIsRecording(true);
+      //start timer
+      setRecordingTime(0);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.error("Failed to start recording:", err);
+    }
+  };
+
+  //stop recording manually
+  const stopRecording = async () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+      if (mediaRecorderRef.current.stream) {
+        mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+      }
+    }
+  };
+
+  //toggle button handler
+  const handleToggleRecording = async () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
 
   let handleEndCall = async () => {
     try {
+      if (isRecording) {
+        stopRecording();
+      }
       let tracks = localVideoRef.current.srcObject.getTracks();
       tracks.forEach((track) => track.stop());
     } catch (e) {
@@ -503,6 +605,51 @@ export default function VideoMeet() {
         <div className={styles.mainContainer}>
           <div className={styles.meetVideoContainer}>
             <div className={styles.buttonContainer}>
+              {isRecording && (
+                <div style={{
+                  position: "absolute",
+                  top: "-55px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  backgroundColor: "rgba(220, 38, 38, 0.95)",
+                  color: "white",
+                  padding: "6px 18px",
+                  borderRadius: "20px",
+                  fontWeight: "700",
+                  fontSize: "0.9rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  boxShadow: "0 0 15px rgba(239, 68, 68, 0.7)",
+                  letterSpacing: "1px"
+                }}>
+                  <span style={{
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    backgroundColor: "white",
+                    display: "inline-block"
+                  }}></span>
+                  REC {formatDuration(recordingTime)}
+                </div>
+              )}
+              {isUploading && (
+                <div style={{
+                  position: "absolute",
+                  top: "-55px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  backgroundColor: "rgba(59, 130, 246, 0.95)",
+                  color: "white",
+                  padding: "6px 18px",
+                  borderRadius: "20px",
+                  fontWeight: "600",
+                  fontSize: "0.9rem",
+                  boxShadow: "0 0 15px rgba(59, 130, 246, 0.6)"
+                }}>
+                  Uploading to Cloudinary... ⏳
+                </div>
+              )}
               <IconButton onClick={handleVideo} style={{ color: "white" }}>
                 {video === true ? <VideoCamIcon /> : <VideoCamOffIcon />}
               </IconButton>
@@ -511,6 +658,14 @@ export default function VideoMeet() {
               </IconButton>
               <IconButton onClick={handleAudio} style={{ color: "white" }}>
                 {audio === true ? <MicIcon /> : <MicOffIcon />}
+              </IconButton>
+              <IconButton
+                onClick={handleToggleRecording}
+                disabled={isUploading}
+                style={{ color: isRecording ? "#ef4444" : "white" }}
+                title={isRecording ? "Stop Recording" : "Start Recording"}
+              >
+                {isRecording ? <StopCircleIcon /> : <RadioButtonCheckedIcon />}
               </IconButton>
               {screenAvailable === true ? (
                 <IconButton onClick={handleScreen} style={{ color: "white" }}>

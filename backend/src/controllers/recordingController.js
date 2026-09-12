@@ -94,7 +94,7 @@ export const deleteRecording = async (req, res) => {
             await cloudinary.uploader.destroy(recording.cloudinary_id, { resource_type: "video" });
         }
         //Delete from MongoDB
-        await findByIdAndDelete(id);
+        await Recording.findByIdAndDelete(id);
         return res.status(200).json({
             message: "Recording deleted successfully"
         });

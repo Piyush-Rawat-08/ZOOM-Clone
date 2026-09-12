@@ -11,6 +11,10 @@ import { AuthContext, client } from "../contexts/AuthContext";
 function HomeComponent() {
     const navigate = useNavigate();
 
+    const { userData } = useContext(AuthContext);
+    const userId = userData?.username || localStorage.getItem("username");
+    const userEmail = userData?.email || localStorage.getItem("email");
+
     const [joinCode, setJoinCode] = useState("");
     const [scheduleTitle, setScheduleTitle] = useState("");
     const [scheduleDate, setScheduleDate] = useState("");
@@ -20,6 +24,39 @@ function HomeComponent() {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [recordings, setRecordings] = useState([]);
+    const [activeVideoModal, setActiveVideoModal] = useState(null);
+
+    const fetchRecordings = async () => {
+        try {
+            const currentUserId = userId || localStorage.getItem("username");
+            if (!currentUserId) {
+                return;
+            }
+            const response = await client.get(`/get_recordings? user_id=${currentUserId}`);
+            const data = Array.isArray(response.data) ? response.data : response.data.recordings;
+            setRecordings(data || []);
+        } catch (error) {
+            console.error("Error fetching recordings: ", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchRecordings();
+    }, [userId]);
+
+    const handleDeleteRecording = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this recording ?")) {
+            return;
+        }
+        try {
+            await client.delete(`/delete_recordings/${id}`);
+            setRecordings((prev) => prev.filter((rec) => rec._id !== id));
+        } catch (error) {
+            console.error("Error deleting recording:", error);
+            alert("failed to delete recording.");
+        }
+    };
 
 
     useEffect(() => {
@@ -28,10 +65,6 @@ function HomeComponent() {
         }, 1000);
         return () => clearInterval(timer);
     }, []);
-
-    const { userData } = useContext(AuthContext);
-    const userId = userData?.username || localStorage.getItem("username");
-    const userEmail = userData?.email || localStorage.getItem("email");
 
     const generateMeetingId = () => {
         const random = Math.random().toString(36).substring(2, 7) + "-" + Math.random().toString(36).substring(2, 7);
@@ -368,22 +401,27 @@ function HomeComponent() {
                                 <div className="recent-recordings-column">
                                     <h3 className="section-title-dash">RECENT RECORDINGS</h3>
                                     <div className="horizontal-recordings-list">
-                                        {/* Mock Data Array based on mockup */}
-                                        {[
-                                            { id: 1, title: "Design review", date: "Sep 2", duration: "38 min" },
-                                            { id: 2, title: "Client onboarding", date: "Aug 30", duration: "22 min" },
-                                            { id: 3, title: "Team standup", date: "Aug 28", duration: "15 min" }
-                                        ].map(rec => (
-                                            <div key={rec.id} className="dash-recording-card light-card">
-                                                <div className="recording-thumbnail">
-                                                    <i className="fa-regular fa-circle-play"></i>
+                                        {recordings.length === 0 ? (
+                                            <p className="empty-subtext"> No Recordings Yet</p>
+                                        ) : (
+                                            recordings.slice(0, 3).map((rec) => (
+                                                <div key={rec._id}
+                                                    className="dash-recording-card light-card"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => setActiveVideoModal(rec.video_url)}
+                                                >
+                                                    <div className="recording-thumbnail">
+                                                        <i className="fa-regular fa-circle-play"></i>
+                                                    </div>
+                                                    <div className="recording-details">
+                                                        <h4>{rec.title}</h4>
+                                                        <p>
+                                                            {new Date(rec.date).toLocaleDateString()} • {rec.duration}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="recording-details">
-                                                    <h4>{rec.title}</h4>
-                                                    <p>{rec.date} • {rec.duration}</p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -530,13 +568,205 @@ function HomeComponent() {
 
                     {/* Render Recordings Tab Placeholder */}
                     {activeTab === "recordings" && (
-                        <section className="glass-panel" style={{ padding: '4rem', textAlign: 'center' }}>
-                            <h2 style={{ color: 'white', marginBottom: '1rem' }}>My Recordings</h2>
-                            <p style={{ color: 'var(--text-muted)' }}>You haven't recorded any meetings yet. This feature is coming soon!</p>
+                        <section className="history-section glass-panel">
+                            <div className="history-header-bar">
+                                <h2>My Meeting Recordings</h2>
+                                <span style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                                    {recordings.length} {recordings.length === 1 ? "recording" : "recordings"} saved on Cloudinary
+                                </span>
+                            </div>
+                            {recordings.length === 0 ? (
+                                <div className="empty-history">
+                                    <p>You haven't recorded any meetings yet.</p>
+                                    <small style={{ color: "var(--text-muted)" }}>
+                                        Click the Record button during any live meeting to save it here.
+                                    </small>
+                                </div>
+                            ) : (
+                                <div style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                                    gap: "1.5rem",
+                                    marginTop: "1.5rem"
+                                }}>
+                                    {recordings.map((rec) => (
+                                        <div
+                                            key={rec._id}
+                                            className="glass-panel"
+                                            style={{
+                                                padding: "1.2rem",
+                                                borderRadius: "16px",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "space-between",
+                                                border: "1px solid rgba(255, 255, 255, 0.1)"
+                                            }}
+                                        >
+                                            <div>
+                                                {/* Thumbnail Container */}
+                                                <div
+                                                    onClick={() => setActiveVideoModal(rec.video_url)}
+                                                    style={{
+                                                        height: "150px",
+                                                        borderRadius: "12px",
+                                                        backgroundColor: "rgba(0, 0, 0, 0.6)",
+                                                        position: "relative",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        cursor: "pointer",
+                                                        overflow: "hidden",
+                                                        marginBottom: "1rem"
+                                                    }}
+                                                >
+                                                    <video
+                                                        src={rec.video_url}
+                                                        style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5 }}
+                                                    />
+                                                    <div style={{
+                                                        position: "absolute",
+                                                        width: "44px",
+                                                        height: "44px",
+                                                        borderRadius: "50%",
+                                                        backgroundColor: "var(--primary-glow, #6366f1)",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        color: "white",
+                                                        fontSize: "1.1rem",
+                                                        boxShadow: "0 4px 15px rgba(99, 102, 241, 0.5)"
+                                                    }}>
+                                                        ▶
+                                                    </div>
+                                                    <span style={{
+                                                        position: "absolute",
+                                                        bottom: "8px",
+                                                        right: "8px",
+                                                        backgroundColor: "rgba(0,0,0,0.85)",
+                                                        color: "white",
+                                                        fontSize: "0.75rem",
+                                                        padding: "2px 8px",
+                                                        borderRadius: "4px"
+                                                    }}>
+                                                        {rec.duration}
+                                                    </span>
+                                                </div>
+                                                {/* Title & Date */}
+                                                <h4 style={{ color: "white", margin: "0 0 6px 0", fontSize: "1.05rem" }}>
+                                                    {rec.title}
+                                                </h4>
+                                                <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: "0 0 12px 0" }}>
+                                                    Room: {rec.meeting_id} • {new Date(rec.date).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            {/* Action Buttons */}
+                                            <div style={{ display: "flex", gap: "0.6rem", marginTop: "0.8rem" }}>
+                                                <button
+                                                    className="btn-primary"
+                                                    style={{ flex: 1, padding: "8px 10px", fontSize: "0.85rem" }}
+                                                    onClick={() => setActiveVideoModal(rec.video_url)}
+                                                >
+                                                    Watch
+                                                </button>
+                                                <a
+                                                    href={rec.video_url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    download={`recording-${rec.meeting_id}.webm`}
+                                                    className="btn-outline"
+                                                    style={{
+                                                        textDecoration: "none",
+                                                        padding: "8px 12px",
+                                                        fontSize: "0.85rem",
+                                                        display: "inline-flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center"
+                                                    }}
+                                                    title="Download Video"
+                                                >
+                                                    ⬇
+                                                </a>
+                                                <button
+                                                    className="delete-btn"
+                                                    style={{ minWidth: "auto", padding: "8px 12px" }}
+                                                    onClick={() => handleDeleteRecording(rec._id)}
+                                                    title="Delete Recording"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </section>
                     )}
                 </main>
             </div>
+            {/* Playback Modal */}
+            {activeVideoModal && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100vw",
+                        height: "100vh",
+                        backgroundColor: "rgba(0, 0, 0, 0.85)",
+                        backdropFilter: "blur(8px)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 9999,
+                    }}
+                    onClick={() => setActiveVideoModal(null)}
+                >
+                    <div
+                        style={{
+                            width: "90%",
+                            maxWidth: "900px",
+                            backgroundColor: "#171827",
+                            borderRadius: "16px",
+                            overflow: "hidden",
+                            boxShadow: "0 20px 50px rgba(0,0,0,0.8)",
+                            border: "1px solid rgba(255, 255, 255, 0.15)",
+                            position: "relative",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            padding: "1rem 1.5rem",
+                            borderBottom: "1px solid rgba(255, 255, 255, 0.1)"
+                        }}>
+                            <h3 style={{ color: "white", margin: 0, fontSize: "1.1rem" }}>
+                                Recording Playback
+                            </h3>
+                            <button
+                                onClick={() => setActiveVideoModal(null)}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    color: "white",
+                                    fontSize: "1.5rem",
+                                    cursor: "pointer",
+                                    lineHeight: 1
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <video
+                            src={activeVideoModal}
+                            controls
+                            autoPlay
+                            style={{ width: "100%", maxHeight: "72vh", display: "block", backgroundColor: "black" }}
+                        />
+                    </div>
+                </div>
+            )}
         </div >
     );
 }

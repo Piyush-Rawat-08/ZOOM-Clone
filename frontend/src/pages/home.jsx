@@ -33,7 +33,7 @@ function HomeComponent() {
             if (!currentUserId) {
                 return;
             }
-            const response = await client.get(`/get_recordings? user_id=${currentUserId}`);
+            const response = await client.get(`/get_recordings?user_id=${currentUserId}`);
             const data = Array.isArray(response.data) ? response.data : response.data.recordings;
             setRecordings(data || []);
         } catch (error) {
@@ -50,14 +50,13 @@ function HomeComponent() {
             return;
         }
         try {
-            await client.delete(`/delete_recordings/${id}`);
+            await client.delete(`/delete_recording/${id}`);
             setRecordings((prev) => prev.filter((rec) => rec._id !== id));
         } catch (error) {
             console.error("Error deleting recording:", error);
             alert("failed to delete recording.");
         }
     };
-
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -268,7 +267,7 @@ function HomeComponent() {
                             onClick={() => handleSidebarClick("dashboard")}
                             style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                         >
-                            <i class="fa-solid fa-house"></i>
+                            <i className="fa-solid fa-house"></i>
                             Dashboard
                         </li>
                         <li

@@ -501,7 +501,7 @@ export default function VideoMeet() {
         formData.append("duration", formatDuration(recordingTime));
 
         try {
-          await client.post("/upload_recording", formData, { headers: { "content-Type": "multipart/form-data" } });
+          await client.post("/upload_recording", formData);
           alert("Recording uploaded to cloudinary successfully");
         } catch (err) {
           console.error("Error uploading recording:", err);
